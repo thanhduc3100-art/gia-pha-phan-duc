@@ -2,94 +2,144 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
-        #tree-container { width: 100%; height: 90vh; background: white; border: 1px solid #ccc; overflow: auto; }
-        .node circle { fill: #fff; stroke: #8b0000; stroke-width: 3px; cursor: pointer; }
-        .node text { font-size: 13px; font-weight: bold; }
-        .link { fill: none; stroke: #8b0000; stroke-opacity: 0.4; stroke-width: 1.5px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background-color: #fcfaf7; 
+            color: #333;
+        }
+        header {
+            background-color: #8b0000;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        h1 { margin: 0; font-size: 1.5rem; }
+        #tree-container { 
+            width: 100%; 
+            height: calc(100vh - 70px); 
+            overflow: auto; 
+            background: white;
+        }
+        .node circle { 
+            fill: #fff; 
+            stroke: #b22222; 
+            stroke-width: 2.5px; 
+        }
+        .node text { 
+            font-size: 13px; 
+            font-weight: 600;
+        }
+        .link { 
+            fill: none; 
+            stroke: #d3d3d3; 
+            stroke-width: 1.5px; 
+        }
+        .error-container {
+            padding: 50px;
+            text-align: center;
+            color: #d9534f;
+        }
+        /* Hiệu ứng khi di chuột vào tên */
+        .node:hover circle { fill: #ffeb3b; stroke: #ff9800; }
     </style>
 </head>
 <body>
-    <h2>Sơ Đồ Gia Phả Phan Đức (Chi Hai Phái Nhì)</h2>
-    <div id="tree-container"></div>
 
-    <script>
-        // LINK API CỦA BẠN
-        const SHEET_API = "https://opensheet.elk.sh/1bKYm6Mk9TzqreY-vFSfwBaJ9YxucRaee/giapha1";
+<header>
+    <h1>Gia Phả Phan Đức - Chi Hai Phái Nhì</h1>
+</header>
 
-        async function drawTree() {
-            try {
-                const response = await fetch(SHEET_API);
-                const rawData = await response.json();
+<div id="tree-container"></div>
 
-                if (!rawData || rawData.length === 0) {
-                    document.body.innerHTML += "<p style='color:red'>Không tìm thấy dữ liệu trong Google Sheet!</p>";
-                    return;
-                }
+<script>
+    // --- CẤU HÌNH DỮ LIỆU ---
+    const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
+    const SHEET_NAME = "giapha1"; // Đảm bảo tên tab dưới cùng của Google Sheets là 'giapha1'
+    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
 
-                // CHUẨN HÓA DỮ LIỆU: Tự động tìm cột ID và Cha_ID bất kể viết hoa hay thường
-                const data = rawData.map(d => {
-                    const normalized = {};
-                    for (let key in d) {
-                        const lowKey = key.toLowerCase().trim();
-                        if (lowKey === 'id') normalized.id = d[key];
-                        if (lowKey === 'cha_id' || lowKey === 'cha') normalized.parentId = d[key];
-                        if (lowKey === 'ho_va_ten' || lowKey === 'ten') normalized.name = d[key];
-                    }
-                    return normalized;
-                });
+    async function loadFamilyTree() {
+        try {
+            const response = await fetch(API_URL);
+            const rawData = await response.json();
 
-                // Cấu trúc cây
-                const stratify = d3.stratify()
-                    .id(d => d.id)
-                    .parentId(d => (d.parentId === "0" || d.parentId === "" || !d.parentId) ? null : d.parentId);
-
-                const root = stratify(data);
-
-                // Thiết lập kích thước
-                const width = window.innerWidth;
-                const height = data.length * 60; // Tự động kéo dài theo số người
-
-                const svg = d3.select("#tree-container").append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .append("g")
-                    .attr("transform", "translate(150, 50)");
-
-                const treeLayout = d3.tree().size([height - 100, width - 400]);
-                treeLayout(root);
-
-                // Vẽ đường nối
-                svg.selectAll(".link")
-                    .data(root.links())
-                    .enter().append("path")
-                    .attr("class", "link")
-                    .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
-
-                // Vẽ nút
-                const node = svg.selectAll(".node")
-                    .data(root.descendants())
-                    .enter().append("g")
-                    .attr("class", "node")
-                    .attr("transform", d => `translate(${d.y},${d.x})`);
-
-                node.append("circle").attr("r", 8);
-                node.append("text")
-                    .attr("dy", ".35em")
-                    .attr("x", d => d.children ? -15 : 15)
-                    .style("text-anchor", d => d.children ? "end" : "start")
-                    .text(d => d.data.name);
-
-            } catch (error) {
-                console.error("Lỗi:", error);
-                document.body.innerHTML += `<p style='color:red'>Lỗi kết nối: ${error.message}</p>`;
+            if (!Array.isArray(rawData)) {
+                throw new Error("Không thể đọc dữ liệu. Hãy kiểm tra tên Tab (Sheet Name) có đúng là 'giapha1' không.");
             }
-        }
 
-        drawTree();
-    </script>
-</body>
-</html>
+            // Chuẩn hóa dữ liệu để máy tính hiểu đúng các cột
+            const processedData = rawData.map(d => ({
+                id: String(d.ID || d.id || "").trim(),
+                parentId: String(d.Cha_ID || d.cha_id || d.cha || "0").trim(),
+                name: d.Ho_va_Ten || d.ho_va_ten || d.ten || "Chưa rõ tên"
+            })).filter(d => d.id !== "");
+
+            renderChart(processedData);
+
+        } catch (error) {
+            document.getElementById('tree-container').innerHTML = `
+                <div class="error-container">
+                    <h3>Cảnh báo lỗi kết nối</h3>
+                    <p>${error.message}</p>
+                    <p><i>Lưu ý: Bạn phải bật "Chia sẻ" cho bất kỳ ai có liên kết đều xem được file Google Sheets.</i></p>
+                </div>
+            `;
+        }
+    }
+
+    function renderChart(data) {
+        const container = document.getElementById('tree-container');
+        // Tự động tính toán chiều cao dựa trên số lượng người (mỗi người khoảng 40px chiều dọc)
+        const width = Math.max(window.innerWidth, 1000);
+        const height = Math.max(window.innerHeight, data.length * 45);
+
+        const svg = d3.select("#tree-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(100, 40)");
+
+        // Tạo cấu trúc cây từ dữ liệu Cha-Con
+        const stratify = d3.stratify()
+            .id(d => d.id)
+            .parentId(d => (d.parentId === "0" || d.parentId === "") ? null : d.parentId);
+
+        const root = stratify(data);
+
+        // Định hình sơ đồ cây theo chiều ngang (Tree Layout)
+        const treeLayout = d3.tree().size([height - 100, width - 350]);
+        treeLayout(root);
+
+        // Vẽ các đường nối (Links)
+        svg.selectAll(".link")
+            .data(root.links())
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("d", d3.linkHorizontal()
+                .x(d => d.y)
+                .y(d => d.x));
+
+        // Vẽ các nút (Nodes)
+        const node = svg.selectAll(".node")
+            .data(root.descendants())
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y},${d.x})`);
+
+        node.append("circle")
+            .attr("r", 6);
+
+        node.append("text")
+            .attr("dy", "0.35em")
+            .attr("x", d => d.children ? -12 : 12
