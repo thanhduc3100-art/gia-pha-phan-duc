@@ -7,18 +7,37 @@
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fcfaf7; }
         header { background: #8b0000; color: white; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #tree-container { width: 100%; height: 85vh; background: white; overflow: auto; }
-        .node circle { fill: #fff; stroke-width: 2.5px; }
-        /* Phân biệt màu sắc: Nam đỏ, Nữ (vợ) màu hồng/tím */
+        #tree-container { width: 100%; height: 80vh; background: white; overflow: auto; position: relative; }
+        
+        /* Cửa sổ chi tiết (Popup) */
+        #detail-card { 
+            position: fixed; right: 20px; top: 100px; width: 300px; 
+            background: white; border-left: 5px solid #8b0000; 
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1); padding: 20px; 
+            display: none; z-index: 1000; border-radius: 5px;
+        }
+        #detail-card h3 { margin-top: 0; color: #8b0000; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        #detail-card p { margin: 10px 0; font-size: 14px; line-height: 1.5; }
+
+        .node circle { fill: #fff; stroke-width: 2.5px; cursor: pointer; }
         .node-male circle { stroke: #8b0000; }
         .node-female circle { stroke: #ff69b4; } 
-        .node text { font-size: 13px; font-weight: 600; }
+        .node text { font-size: 13px; font-weight: 600; cursor: pointer; }
         .link { fill: none; stroke: #d3d3d3; stroke-width: 1.5px; }
     </style>
 </head>
 <body>
 
 <header><h1>Gia Phả Phan Đức - Chi Hai Phái Nhì</h1></header>
+
+<div id="detail-card">
+    <h3 id="card-name">Thông tin chi tiết</h3>
+    <p><strong>Ngày mất:</strong> <span id="card-death"></span></p>
+    <p><strong>Nơi an táng:</strong> <span id="card-burial"></span></p>
+    <p><strong>Ghi chú:</strong> <span id="card-note"></span></p>
+    <button onclick="document.getElementById('detail-card').style.display='none'" style="margin-top:10px; cursor:pointer;">Đóng</button>
+</div>
+
 <div id="tree-container"></div>
 
 <script>
@@ -33,26 +52,22 @@
             const data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || d.cha || "").trim(),
-                name: d.Ho_va_Ten || d.ten || "Chưa rõ",
+                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                death: d.Ngay_Mat || "Không rõ",
+                burial: d.Noi_an_tang || d.An_tang || "Chưa cập nhật",
+                note: d.Ghi_Chu || d.ghi_chu || "Không có",
                 isWife: String(d.ID).toUpperCase().endsWith('W')
             })).filter(d => d.id !== "");
 
-            // Sửa lỗi Multiple Roots: Chỉ người đầu tiên được phép có parentId là null
-            let rootId = data[0].id;
+            // Xử lý logic 1 gốc duy nhất
             const finalData = data.map((d, index) => {
-                if (index === 0) {
-                    d.parentId = null;
-                } else if (d.parentId === "0" || d.parentId === "") {
-                    // Nếu lỡ để trống hoặc 0 ở những người sau, tự động gắn vào gốc để không bị lỗi
-                    d.parentId = rootId;
-                }
+                if (index === 0) d.parentId = null;
+                else if (d.parentId === "0" || d.parentId === "") d.parentId = data[0].id;
                 return d;
             });
 
             renderTree(finalData);
-        } catch (err) {
-            console.error(err);
-        }
+        } catch (err) { console.error(err); }
     }
 
     function renderTree(data) {
@@ -73,12 +88,26 @@
 
         const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
             .attr("class", d => `node ${d.data.isWife ? 'node-female' : 'node-male'}`)
-            .attr("transform", d => `translate(${d.y},${d.x})`);
+            .attr("transform", d => `translate(${d.y},${d.x})`)
+            .on("click", (event, d) => showDetail(d.data)); // Thêm sự kiện Click
 
-        node.append("circle").attr("r", 6);
+        node.append("circle").attr("r", 7);
+
         node.append("text").attr("dy", "0.35em").attr("x", d => d.children ? -15 : 15)
             .style("text-anchor", d => d.children ? "end" : "start")
-            .text(d => d.data.isWife ? `(Bà) ${d.data.name}` : d.data.name);
+            .text(d => {
+                const prefix = d.data.isWife ? "(Bà) " : "Ông ";
+                return prefix + d.data.name;
+            });
+    }
+
+    function showDetail(person) {
+        const card = document.getElementById('detail-card');
+        document.getElementById('card-name').innerText = (person.isWife ? "(Bà) " : "Ông ") + person.name;
+        document.getElementById('card-death').innerText = person.death;
+        document.getElementById('card-burial').innerText = person.burial;
+        document.getElementById('card-note').innerText = person.note;
+        card.style.display = 'block';
     }
 
     init();
