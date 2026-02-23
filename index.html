@@ -49,17 +49,32 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            const data = rawData.map(d => ({
-                id: String(d.ID || "").trim(),
-                parentId: String(d.Cha_ID || d.cha || "").trim(),
-                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
-                death: d.Ngay_Mat || "Không rõ",
-                burial: d.Noi_an_tang || d.An_tang || "Chưa cập nhật",
-                note: d.Ghi_Chu || d.ghi_chu || "Không có",
-                isWife: String(d.ID).toUpperCase().endsWith('W')
-            })).filter(d => d.id !== "");
+            const data = rawData.map(d => {
+                // Tạo một bản sao dữ liệu với tất cả các phím (keys) là chữ thường để dễ tìm
+                const normalizedRow = {};
+                for (let key in d) {
+                    normalizedRow[key.toLowerCase().trim()] = d[key];
+                }
 
-            // Xử lý logic 1 gốc duy nhất
+                return {
+                    id: String(d.ID || "").trim(),
+                    parentId: String(d.Cha_ID || d.cha || "").trim(),
+                    name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                    
+                    // Tìm cột Ngày mất (có thể là ngay_mat, ngay_mat_al, ...)
+                    death: normalizedRow['ngay_mat'] || normalizedRow['mất'] || "Không rõ",
+                    
+                    // Tìm cột Nơi an táng (quan trọng)
+                    burial: normalizedRow['noi_an_tang'] || normalizedRow['an_tang'] || normalizedRow['chôn cất'] || "Chưa cập nhật",
+                    
+                    // Tìm cột Ghi chú
+                    note: normalizedRow['ghi_chu'] || normalizedRow['ghi chú'] || "Không có",
+                    
+                    isWife: String(d.ID).toUpperCase().endsWith('W')
+                };
+            }).filter(d => d.id !== "");
+
+            // Giữ nguyên logic xử lý gốc rễ (root)
             const finalData = data.map((d, index) => {
                 if (index === 0) d.parentId = null;
                 else if (d.parentId === "0" || d.parentId === "") d.parentId = data[0].id;
@@ -67,7 +82,7 @@
             });
 
             renderTree(finalData);
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Lỗi tải dữ liệu:", err); }
     }
 
     function renderTree(data) {
@@ -114,4 +129,5 @@
 </script>
 </body>
 </html>
+
 
