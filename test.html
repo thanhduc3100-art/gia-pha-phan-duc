@@ -5,30 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
     <style>
-        :root { --red-dark: #8b0000; --gold: #d4af37; --light-gold: #fdf5e6; }
-        body { font-family: 'Times New Roman', serif; margin: 0; background: #fffcf8; }
+        /* Định nghĩa màu sắc chủ đạo */
+        :root { --red-dark: #8b0000; --gold: #d4af37; --bg-light: #fffcf8; }
+        body { font-family: 'Roboto', 'Times New Roman', serif; margin: 0; background: var(--bg-light); }
+        h1, h2, .navbar a { font-family: 'Playfair Display', serif; }
+
+        /* --- PHẦN BANNER MỚI THÊM --- */
+        .banner-container {
+            width: 100%;
+            max-height: 350px; /* Chiều cao tối đa của banner, bạn có thể chỉnh số này */
+            overflow: hidden; /* Ẩn phần thừa nếu ảnh quá cao */
+            background-color: var(--red-dark); /* Màu nền phòng khi ảnh chưa tải xong */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .banner-image {
+            width: 100%;
+            height: auto;
+            object-fit: cover; /* Đảm bảo ảnh phủ kín khung mà không bị méo */
+            display: block;
+        }
+        /* --------------------------- */
         
         /* Menu chính */
-        .navbar { background: var(--red-dark); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--gold); }
-        .navbar a { color: white; text-decoration: none; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 14px; transition: 0.3s; }
-        .navbar a:hover { background: rgba(255,255,255,0.1); color: var(--gold); }
+        .navbar { background: var(--red-dark); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .navbar a { color: white; text-decoration: none; padding: 15px 25px; font-weight: bold; text-transform: uppercase; font-size: 14px; transition: 0.3s; letter-spacing: 1px; }
+        .navbar a:hover { background: rgba(255,255,255,0.15); color: var(--gold); }
         .navbar a.active { background: var(--gold); color: var(--red-dark); }
 
         /* Vùng nội dung */
-        .content-section { display: none; padding: 30px; max-width: 1200px; margin: auto; min-height: 80vh; }
-        .content-section.active { display: block; animation: fadeIn 0.4s; }
+        .content-section { display: none; padding: 40px 20px; max-width: 1200px; margin: auto; min-height: 60vh; animation: fadeIn 0.5s ease-in-out; }
+        .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Tiêu đề mục */
-        .section-header { border-bottom: 2px solid var(--red-dark); color: var(--red-dark); margin-bottom: 20px; padding-bottom: 10px; }
+        .section-header { border-bottom: 3px solid var(--red-dark); color: var(--red-dark); margin-bottom: 30px; padding-bottom: 15px; text-align: center; font-size: 2rem; }
         
         /* Đặc thù trang Phả hệ */
-        #tree-display { width: 100%; height: 700px; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: auto; }
+        #tree-display { width: 100%; height: 700px; background: white; border: 2px solid #ddd; border-radius: 8px; overflow: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        .node circle { fill: #fff; stroke: var(--red-dark); stroke-width: 2.5px; transition: 0.3s; }
+        .node text { font-size: 14px; font-weight: bold; }
+        .link { fill: none; stroke: #ccc; stroke-width: 1.5px; }
     </style>
 </head>
 <body>
 
+<div class="banner-container">
+    <img src="image4.jpg" alt="Nhà thờ họ Phan Đức - Chi Hai Phái Nhì" class="banner-image">
+</div>
 <div class="navbar">
     <a href="javascript:void(0)" class="active" onclick="tab(event, 'home')">Trang Chủ</a>
     <a href="javascript:void(0)" onclick="tab(event, 'history')">Lịch Sử</a>
@@ -40,8 +66,9 @@
 </div>
 
 <section id="home" class="content-section active">
-    <h1 class="section-header">Chào mừng về với Phái Nhì - Chi Hai</h1>
-    <p>Nơi kết nối tình thân và gìn giữ cội nguồn dòng họ Phan Đức...</p>
+    <h1 class="section-header" style="border:none;">Chào mừng về với Phái Nhì - Chi Hai</h1>
+    <div style="text-align: center; font-style: italic; margin-bottom: 30px; color: #666;">"Cây có cội, nước có nguồn - Chim có tổ, người có tông"</div>
+    <p style="text-align: center; font-size: 1.1rem; line-height: 1.6;">Nơi kết nối tình thân và gìn giữ cội nguồn dòng họ Phan Đức...</p>
 </section>
 
 <section id="history" class="content-section">
@@ -83,12 +110,52 @@
     function tab(evt, sectionId) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.navbar a').forEach(a => a.classList.remove('active'));
-        
         document.getElementById(sectionId).classList.add('active');
         evt.currentTarget.classList.add('active');
-        
-        // Nếu là tab Phả đồ, gọi lại hàm vẽ cây (nếu cần)
-        if(sectionId === 'tree') { /* logic vẽ cây D3 ở đây */ }
+        if(sectionId === 'tree') { initTree(); }
+    }
+
+    // Vẽ cây D3 (Logic cũ)
+    async function initTree() {
+        if (document.querySelector("#tree-display svg")) return;
+        const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
+        try {
+            const res = await fetch(`https://opensheet.elk.sh/${SHEET_ID}/giapha1`);
+            const rawData = await res.json();
+            const data = rawData.map(d => ({
+                id: String(d.ID || "").trim(),
+                parentId: String(d.Cha_ID || d.cha || "").trim(),
+                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                isWife: String(d.ID).toUpperCase().endsWith('W')
+            })).filter(d => d.id !== "");
+
+            let rootId = data[0].id;
+            const finalData = data.map((d, index) => {
+                if (index === 0) d.parentId = null;
+                else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
+                return d;
+            });
+
+            const width = document.getElementById('tree-display').offsetWidth;
+            const height = finalData.length * 50 + 200;
+            const svg = d3.select("#tree-display").append("svg")
+                .attr("width", width).attr("height", height)
+                .append("g").attr("transform", "translate(150, 40)");
+
+            const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(finalData);
+            d3.tree().size([height - 100, width - 300])(root);
+
+            svg.selectAll(".link").data(root.links()).enter().append("path")
+                .attr("class", "link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+
+            const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
+                .attr("class", "node").attr("transform", d => `translate(${d.y},${d.x})`);
+
+            node.append("circle").attr("r", 6).style("stroke", d => d.data.isWife ? "#ff69b4" : "#8b0000");
+            node.append("text").attr("dy", "0.35em").attr("x", d => d.children ? -12 : 12)
+                .style("text-anchor", d => d.children ? "end" : "start")
+                .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
+        } catch (e) { console.error(e); }
     }
 </script>
 
