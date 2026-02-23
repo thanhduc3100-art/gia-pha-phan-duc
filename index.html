@@ -5,62 +5,88 @@
     <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        .node circle { fill: #fff; stroke: #8b0000; stroke-width: 3px; }
-        .node text { font: 12px sans-serif; font-weight: bold; }
-        .link { fill: none; stroke: #ccc; stroke-width: 2px; }
-        #tree-container { width: 100%; height: 800px; border: 1px solid #ddd; background: #fdfdfd; }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        #tree-container { width: 100%; height: 90vh; background: white; border: 1px solid #ccc; overflow: auto; }
+        .node circle { fill: #fff; stroke: #8b0000; stroke-width: 3px; cursor: pointer; }
+        .node text { font-size: 13px; font-weight: bold; }
+        .link { fill: none; stroke: #8b0000; stroke-opacity: 0.4; stroke-width: 1.5px; }
     </style>
 </head>
 <body>
-    <h1>Cây Gia Phả Phan Đức (Chi Hai Phái Nhì)</h1>
+    <h2>Sơ Đồ Gia Phả Phan Đức (Chi Hai Phái Nhì)</h2>
     <div id="tree-container"></div>
 
     <script>
-        // THAY LINK API CỦA BẠN VÀO ĐÂY
+        // LINK API CỦA BẠN
         const SHEET_API = "https://opensheet.elk.sh/1bKYm6Mk9TzqreY-vFSfwBaJ9YxucRaee/giapha1";
 
         async function drawTree() {
-            const response = await fetch(SHEET_API);
-            const data = await response.json();
+            try {
+                const response = await fetch(SHEET_API);
+                const rawData = await response.json();
 
-            // Chuyển đổi dữ liệu phẳng sang cấu trúc cây (Parent-Child)
-            const stratify = d3.stratify()
-                .id(d => d.ID)
-                .parentId(d => d.Cha_ID === "0" ? null : d.Cha_ID);
+                if (!rawData || rawData.length === 0) {
+                    document.body.innerHTML += "<p style='color:red'>Không tìm thấy dữ liệu trong Google Sheet!</p>";
+                    return;
+                }
 
-            const root = stratify(data);
-            const width = 1000;
-            const height = 600;
+                // CHUẨN HÓA DỮ LIỆU: Tự động tìm cột ID và Cha_ID bất kể viết hoa hay thường
+                const data = rawData.map(d => {
+                    const normalized = {};
+                    for (let key in d) {
+                        const lowKey = key.toLowerCase().trim();
+                        if (lowKey === 'id') normalized.id = d[key];
+                        if (lowKey === 'cha_id' || lowKey === 'cha') normalized.parentId = d[key];
+                        if (lowKey === 'ho_va_ten' || lowKey === 'ten') normalized.name = d[key];
+                    }
+                    return normalized;
+                });
 
-            const treeLayout = d3.tree().size([width - 200, height - 100]);
-            treeLayout(root);
+                // Cấu trúc cây
+                const stratify = d3.stratify()
+                    .id(d => d.id)
+                    .parentId(d => (d.parentId === "0" || d.parentId === "" || !d.parentId) ? null : d.parentId);
 
-            const svg = d3.select("#tree-container").append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .append("g")
-                .attr("transform", "translate(100, 50)");
+                const root = stratify(data);
 
-            // Vẽ đường nối
-            svg.selectAll(".link")
-                .data(root.links())
-                .enter().append("path")
-                .attr("class", "link")
-                .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y));
+                // Thiết lập kích thước
+                const width = window.innerWidth;
+                const height = data.length * 60; // Tự động kéo dài theo số người
 
-            // Vẽ các nút (thành viên)
-            const node = svg.selectAll(".node")
-                .data(root.descendants())
-                .enter().append("g")
-                .attr("class", "node")
-                .attr("transform", d => `translate(${d.x},${d.y})`);
+                const svg = d3.select("#tree-container").append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g")
+                    .attr("transform", "translate(150, 50)");
 
-            node.append("circle").attr("r", 10);
-            node.append("text")
-                .attr("dy", ".35em")
-                .attr("y", d => d.children ? -20 : 20)
-                .style("text-anchor", "middle")
-                .text(d => d.data.Ho_va_Ten);
+                const treeLayout = d3.tree().size([height - 100, width - 400]);
+                treeLayout(root);
+
+                // Vẽ đường nối
+                svg.selectAll(".link")
+                    .data(root.links())
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+
+                // Vẽ nút
+                const node = svg.selectAll(".node")
+                    .data(root.descendants())
+                    .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", d => `translate(${d.y},${d.x})`);
+
+                node.append("circle").attr("r", 8);
+                node.append("text")
+                    .attr("dy", ".35em")
+                    .attr("x", d => d.children ? -15 : 15)
+                    .style("text-anchor", d => d.children ? "end" : "start")
+                    .text(d => d.data.name);
+
+            } catch (error) {
+                console.error("Lỗi:", error);
+                document.body.innerHTML += `<p style='color:red'>Lỗi kết nối: ${error.message}</p>`;
+            }
         }
 
         drawTree();
