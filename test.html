@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root { --red-dark: #8b0000; --gold: #d4af37; --light-gold: #fdf5e6; }
+        body { font-family: 'Times New Roman', serif; margin: 0; background: #fffcf8; }
+        
+        /* Menu chính */
+        .navbar { background: var(--red-dark); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--gold); }
+        .navbar a { color: white; text-decoration: none; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 14px; transition: 0.3s; }
+        .navbar a:hover { background: rgba(255,255,255,0.1); color: var(--gold); }
+        .navbar a.active { background: var(--gold); color: var(--red-dark); }
+
+        /* Vùng nội dung */
+        .content-section { display: none; padding: 30px; max-width: 1200px; margin: auto; min-height: 80vh; }
+        .content-section.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Tiêu đề mục */
+        .section-header { border-bottom: 2px solid var(--red-dark); color: var(--red-dark); margin-bottom: 20px; padding-bottom: 10px; }
+        
+        /* Đặc thù trang Phả hệ */
+        #tree-display { width: 100%; height: 700px; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: auto; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="javascript:void(0)" class="active" onclick="tab(event, 'home')">Trang Chủ</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'history')">Lịch Sử</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'tree')">Phả Đồ</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'sacred')">Thờ Phụng & An Táng</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'anniversary')">Ngày Giỗ & Kỵ</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'news')">Tin Tức</a>
+    <a href="javascript:void(0)" onclick="tab(event, 'donate')">Đóng Góp</a>
+</div>
+
+<section id="home" class="content-section active">
+    <h1 class="section-header">Chào mừng về với Phái Nhì - Chi Hai</h1>
+    <p>Nơi kết nối tình thân và gìn giữ cội nguồn dòng họ Phan Đức...</p>
+</section>
+
+<section id="history" class="content-section">
+    <h2 class="section-header">Lịch sử Dòng họ</h2>
+    <p>Thông tin về cụ Phan Đức Mưu và tổ tiên từ đời thứ 1 đến nay...</p>
+</section>
+
+<section id="tree" class="content-section">
+    <h2 class="section-header">Sơ đồ Phả hệ Trực tuyến</h2>
+    <div id="tree-display"></div>
+</section>
+
+<section id="sacred" class="content-section">
+    <h2 class="section-header">Nơi an táng & Thờ phụng</h2>
+    <ul>
+        <li>Nghĩa trang Trà Am, Huế</li>
+        <li>Nghĩa trang gia đình Phan Đức - Hòa Sơn, Đà Nẵng</li>
+        <li>Nhà thờ phái Hai, Chi Hai - Vỹ Dạ, Huế</li>
+    </ul>
+</section>
+
+<section id="anniversary" class="content-section">
+    <h2 class="section-header">Ngày Giỗ & Kỵ</h2>
+    <p>Danh sách các ngày kỷ niệm quan trọng trong năm của phái...</p>
+</section>
+
+<section id="news" class="content-section">
+    <h2 class="section-header">Tin Tức Dòng Họ</h2>
+    <p>Các hoạt động mới nhất của Ban liên lạc...</p>
+</section>
+
+<section id="donate" class="content-section">
+    <h2 class="section-header">Đóng Góp Xây Dựng Gia Phả</h2>
+    <p>Gửi thông tin, hình ảnh hoặc đóng góp quỹ để duy trì website...</p>
+</section>
+
+<script>
+    // Xử lý chuyển tab
+    function tab(evt, sectionId) {
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.navbar a').forEach(a => a.classList.remove('active'));
+        
+        document.getElementById(sectionId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+        
+        // Nếu là tab Phả đồ, gọi lại hàm vẽ cây (nếu cần)
+        if(sectionId === 'tree') { /* logic vẽ cây D3 ở đây */ }
+    }
+</script>
+
+</body>
+</html>
