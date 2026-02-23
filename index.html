@@ -5,129 +5,129 @@
     <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fcfaf7; }
-        header { background: #8b0000; color: white; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #tree-container { width: 100%; height: 80vh; background: white; overflow: auto; position: relative; }
+        :root { --primary-color: #8b0000; --bg-color: #fdfaf6; }
+        body { font-family: 'Times New Roman', Times, serif; margin: 0; background: var(--bg-color); display: flex; flex-direction: column; height: 100vh; }
         
-        /* Cửa sổ chi tiết (Popup) */
-        #detail-card { 
-            position: fixed; right: 20px; top: 100px; width: 300px; 
-            background: white; border-left: 5px solid #8b0000; 
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1); padding: 20px; 
-            display: none; z-index: 1000; border-radius: 5px;
-        }
-        #detail-card h3 { margin-top: 0; color: #8b0000; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        #detail-card p { margin: 10px 0; font-size: 14px; line-height: 1.5; }
+        /* Menu phía trên */
+        nav { background: var(--primary-color); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .search-box { padding: 8px; border-radius: 20px; border: none; width: 250px; outline: none; }
 
-        .node circle { fill: #fff; stroke-width: 2.5px; cursor: pointer; }
-        .node-male circle { stroke: #8b0000; }
-        .node-female circle { stroke: #ff69b4; } 
-        .node text { font-size: 13px; font-weight: 600; cursor: pointer; }
-        .link { fill: none; stroke: #d3d3d3; stroke-width: 1.5px; }
+        /* Vùng hiển thị chính */
+        main { display: flex; flex: 1; overflow: hidden; }
+        #tree-container { flex: 1; background: white; cursor: grab; position: relative; }
+        
+        /* Sidebar thông tin */
+        #sidebar { width: 320px; background: white; border-left: 2px solid #eee; padding: 20px; box-shadow: -2px 0 5px rgba(0,0,0,0.05); overflow-y: auto; display: none; }
+        .info-header { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px; }
+        
+        .node circle { stroke-width: 2px; transition: 0.3s; }
+        .node-male circle { fill: #fff; stroke: var(--primary-color); }
+        .node-female circle { fill: #fff; stroke: #ff69b4; }
+        .node:hover circle { r: 10; fill: #ffeb3b; }
+        .node text { font-size: 14px; font-weight: bold; }
+        .link { fill: none; stroke: #ccc; stroke-width: 1.5px; }
     </style>
 </head>
 <body>
 
-<header><h1>Gia Phả Phan Đức - Chi Hai Phái Nhì</h1></header>
+<nav>
+    <div style="font-size: 1.2rem; font-weight: bold;">GIA PHẢ PHAN ĐỨC (CHI HAI PHÁI NHÌ)</div>
+    <input type="text" class="search-box" placeholder="Tìm tên cụ (ví dụ: Mưu)..." oninput="searchName(this.value)">
+</nav>
 
-<div id="detail-card">
-    <h3 id="card-name">Thông tin chi tiết</h3>
-    <p><strong>Ngày mất:</strong> <span id="card-death"></span></p>
-    <p><strong>Nơi an táng:</strong> <span id="card-burial"></span></p>
-    <p><strong>Ghi chú:</strong> <span id="card-note"></span></p>
-    <button onclick="document.getElementById('detail-card').style.display='none'" style="margin-top:10px; cursor:pointer;">Đóng</button>
-</div>
-
-<div id="tree-container"></div>
+<main>
+    <div id="tree-container"></div>
+    <div id="sidebar">
+        <div class="info-header"><h3 id="side-name">Thông tin chi tiết</h3></div>
+        <p><b>Đời thứ:</b> <span id="side-generation"></span></p>
+        <p><b>Ngày mất:</b> <span id="side-death"></span></p>
+        <p><b>Nơi an táng:</b> <span id="side-burial"></span></p>
+        <p><b>Ghi chú:</b> <div id="side-note" style="font-style: italic; color: #555;"></div></p>
+    </div>
+</main>
 
 <script>
     const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
     const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/giapha1`;
+    let allNodes = [];
 
     async function init() {
         try {
             const res = await fetch(API_URL);
             const rawData = await res.json();
-
+            
             const data = rawData.map(d => {
-                // Tạo một bản sao dữ liệu với tất cả các phím (keys) là chữ thường để dễ tìm
-                const normalizedRow = {};
-                for (let key in d) {
-                    normalizedRow[key.toLowerCase().trim()] = d[key];
-                }
-
+                const row = {};
+                for (let key in d) row[key.toLowerCase().trim()] = d[key];
                 return {
                     id: String(d.ID || "").trim(),
-                    parentId: String(d.Cha_ID || d.cha || "").trim(),
-                    name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
-                    
-                    // Tìm cột Ngày mất (có thể là ngay_mat, ngay_mat_al, ...)
-                    death: normalizedRow['ngay_mat'] || normalizedRow['mất'] || "Không rõ",
-                    
-                    // Tìm cột Nơi an táng (quan trọng)
-                    burial: normalizedRow['noi_an_tang'] || normalizedRow['an_tang'] || normalizedRow['chôn cất'] || "Chưa cập nhật",
-                    
-                    // Tìm cột Ghi chú
-                    note: normalizedRow['ghi_chu'] || normalizedRow['ghi chú'] || "Không có",
-                    
-                    isWife: String(d.ID).toUpperCase().endsWith('W')
+                    parentId: String(d.Cha_ID || "").trim(),
+                    name: (d.Ho_va_Ten || "Chưa rõ").trim(),
+                    death: row['ngay_mat'] || "Không rõ",
+                    burial: row['noi_an_tang'] || row['an_tang'] || "Chưa cập nhật",
+                    note: row['ghi_chu'] || "Không có",
+                    isWife: String(d.ID).toUpperCase().endsWith('W'),
+                    doi: d.Doi || "?"
                 };
             }).filter(d => d.id !== "");
 
-            // Giữ nguyên logic xử lý gốc rễ (root)
-            const finalData = data.map((d, index) => {
-                if (index === 0) d.parentId = null;
-                else if (d.parentId === "0" || d.parentId === "") d.parentId = data[0].id;
+            // Logic 1 gốc
+            const finalData = data.map((d, i) => {
+                if (i === 0) d.parentId = null;
+                else if (!d.parentId || d.parentId === "0") d.parentId = data[0].id;
                 return d;
             });
 
             renderTree(finalData);
-        } catch (err) { console.error("Lỗi tải dữ liệu:", err); }
+        } catch (e) { console.error(e); }
     }
 
     function renderTree(data) {
-        const width = Math.max(window.innerWidth, 1200);
-        const height = data.length * 50 + 200;
+        const width = 2000, height = data.length * 60;
         const svg = d3.select("#tree-container").append("svg")
-            .attr("width", width).attr("height", height)
-            .append("g").attr("transform", "translate(150, 40)");
+            .attr("width", "100%").attr("height", "100%")
+            .call(d3.zoom().on("zoom", (e) => g.attr("transform", e.transform)))
+            .append("g");
+        
+        const g = svg.append("g").attr("transform", "translate(150, 50)");
 
         const stratify = d3.stratify().id(d => d.id).parentId(d => d.parentId);
         const root = stratify(data);
-        const treeLayout = d3.tree().size([height - 100, width - 450]);
+        const treeLayout = d3.tree().nodeSize([50, 250]);
         treeLayout(root);
 
-        svg.selectAll(".link").data(root.links()).enter().append("path")
+        g.selectAll(".link").data(root.links()).enter().append("path")
             .attr("class", "link")
             .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
-        const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
+        const node = g.selectAll(".node").data(root.descendants()).enter().append("g")
             .attr("class", d => `node ${d.data.isWife ? 'node-female' : 'node-male'}`)
             .attr("transform", d => `translate(${d.y},${d.x})`)
-            .on("click", (event, d) => showDetail(d.data)); // Thêm sự kiện Click
+            .on("click", (e, d) => showSidebar(d.data));
 
-        node.append("circle").attr("r", 7);
-
+        node.append("circle").attr("r", 8);
         node.append("text").attr("dy", "0.35em").attr("x", d => d.children ? -15 : 15)
             .style("text-anchor", d => d.children ? "end" : "start")
-            .text(d => {
-                const prefix = d.data.isWife ? "(Bà) " : "Ông ";
-                return prefix + d.data.name;
-            });
+            .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
+        
+        allNodes = node; // Lưu lại để tìm kiếm
     }
 
-    function showDetail(person) {
-        const card = document.getElementById('detail-card');
-        document.getElementById('card-name').innerText = (person.isWife ? "(Bà) " : "Ông ") + person.name;
-        document.getElementById('card-death').innerText = person.death;
-        document.getElementById('card-burial').innerText = person.burial;
-        document.getElementById('card-note').innerText = person.note;
-        card.style.display = 'block';
+    function showSidebar(d) {
+        document.getElementById('sidebar').style.display = 'block';
+        document.getElementById('side-name').innerText = (d.isWife ? "(Bà) " : "Ông ") + d.name;
+        document.getElementById('side-generation').innerText = d.doi;
+        document.getElementById('side-death').innerText = d.death;
+        document.getElementById('side-burial').innerText = d.burial;
+        document.getElementById('side-note').innerText = d.note;
+    }
+
+    function searchName(val) {
+        if (!val) { allNodes.style("opacity", 1); return; }
+        allNodes.style("opacity", d => d.data.name.toLowerCase().includes(val.toLowerCase()) ? 1 : 0.1);
     }
 
     init();
 </script>
 </body>
 </html>
-
-
