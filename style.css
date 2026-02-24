@@ -179,3 +179,22 @@ footer {
         font-weight: bold;
     }
 }
+/* Unify all navbar items (Main and Dropdown) */
+.navbar a, 
+.navbar .dropbtn, 
+.dropdown-content a {
+    font-size: 14px !important;    /* Kích thước chữ đồng nhất */
+    font-weight: bold !important;  /* Ép chữ đậm */
+    text-transform: uppercase;     /* Tự động viết hoa nếu bạn quên */
+    padding: 12px 15px;            /* Khoảng cách đệm đều nhau */
+    display: inline-block;
+    color: white;                  /* Màu chữ trắng cho rõ */
+    text-decoration: none;
+}
+
+/* Đảm bảo các mục trong menu con không bị đổi màu nền quá tối */
+.dropdown-content a {
+    background-color: transparent !important; 
+    width: 100%;
+    text-align: left;
+}
