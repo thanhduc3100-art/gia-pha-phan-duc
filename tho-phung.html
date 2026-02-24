@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Nơi Thờ Phụng - Phan Đức</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Phong cách trình bày riêng cho các địa điểm thờ phụng */
+        .worship-location { 
+            margin-bottom: 60px; 
+            padding-bottom: 30px; 
+        }
+        .worship-location:not(:last-child) { 
+            border-bottom: 2px double #ddd; 
+        }
+        
+        .location-name {
+            color: var(--red-dark);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+            border-left: 5px solid var(--gold);
+            padding-left: 15px;
+        }
+
+        .location-description {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            text-align: justify;
+            white-space: pre-wrap; /* Hiển thị đúng các dòng xuống hàng từ Sheets */
+        }
+
+        .location-image {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 30px auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="banner-container">
+    <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
+</div>
+
+<nav class="navbar">
+    <a href="index.html">Trang Chủ</a>
+    <a href="lich-su.html">Lịch Sử</a>
+    <a href="pha-he.html">Phả Đồ</a>
+    <div class="dropdown">
+        <button class="dropbtn">Thờ Phụng & An Táng ▼</button>
+        <div class="dropdown-content">
+            <a href="tho-phung.html">Nơi Thờ Phụng</a>
+            <a href="khu-mo.html">Khu Mộ Gia Tộc</a>
+        </div>
+    </div>
+    <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
+    <a href="tin-tuc.html">Tin Tức</a>
+    <a href="dong-gop.html">Đóng Góp</a>
+</nav>
+
+<main class="content-section">
+    <h1 id="main-title" style="text-align: center; color: var(--red-dark); font-size: 2.5rem; margin-bottom: 50px;">CÁC NƠI THỜ PHỤNG</h1>
+    <div id="worship-list"></div>
+</main>
+
+<script>
+    const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
+    // Đã cập nhật tên Sheet thành noi_tho_phung theo yêu cầu của bạn
+    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/noi_tho_phung`;
+
+    async function loadWorshipData() {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            let listHtml = "";
+            
+            data.forEach(item => {
+                if(item.Vi_tri === "Tieu_de") {
+                    document.getElementById('main-title').innerText = item.Noi_dung;
+                } else {
+                    listHtml += `
+                        <div class="worship-location">
+                            <strong class="location-name">${item.Vi_tri}</strong>
+                            <div class="location-description">${item.Noi_dung}</div>
+                            ${item.Hinh_anh ? `<img src="${item.Hinh_anh}" class="location-image" alt="${item.Vi_tri}">` : ''}
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('worship-list').innerHTML = listHtml;
+        } catch (e) { 
+            console.error("Lỗi tải dữ liệu:", e);
+            document.getElementById('main-title').innerText = "Không thể tải dữ liệu";
+        }
+    }
+    loadWorshipData();
+</script>
+
+<footer>
+    &copy; 2026 Gia phả Phan Đức - Chi Hai Phái Nhì. All rights reserved.
+</footer>
+
+</body>
+</html>
