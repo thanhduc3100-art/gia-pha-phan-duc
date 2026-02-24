@@ -67,26 +67,35 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            // 1. Chuẩn hóa dữ liệu
+            // 1. Chuyển đổi dữ liệu và làm sạch
             const data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
-                parentId: String(d.Cha_ID || d.cha || "").trim(),
-                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                parentId: String(d.Cha_ID || "").trim(),
+                name: (d.Ho_va_Ten || "Chưa rõ").trim(),
                 isWife: String(d.ID).toUpperCase().endsWith('W')
             })).filter(d => d.id !== "");
 
-            // 2. Tìm cụ tổ (người không có parentId hoặc parentId không tồn tại trong danh sách ID)
+            // 2. Tìm danh sách tất cả ID đang có
             const allIds = new Set(data.map(d => d.id));
+
+            // 3. Xử lý logic Cha-Con để tránh lỗi sập sơ đồ
             data.forEach(d => {
-                if (!allIds.has(d.parentId)) {
-                    d.parentId = null; // Gốc của cây
+                // Nếu Cha_ID không tồn tại trong danh sách ID, thì coi như người này là cụ tổ (Gốc)
+                if (d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId)) {
+                    d.parentId = null; 
                 }
+                // Ngăn lỗi một người tự làm cha chính mình
+                if (d.parentId === d.id) d.parentId = null;
             });
+
+            // 4. Sắp xếp để cụ tổ lên đầu
+            data.sort((a, b) => (a.parentId === null ? -1 : 1));
 
             renderD3(data);
         } catch (e) { 
-            console.error("Lỗi tải dữ liệu:", e); 
-            document.getElementById('tree-display').innerHTML = "<p style='text-align:center; color:red;'>Không thể tải dữ liệu phả hệ. Vui lòng kiểm tra lại Google Sheets.</p>";
+            console.error("Lỗi chi tiết:", e); 
+            document.getElementById('tree-display').innerHTML = 
+                `<p style='text-align:center; color:red;'>Dữ liệu đã thông nhưng chưa vẽ được. <br> Lỗi: ${e.message}</p>`;
         }
     }
 
@@ -145,3 +154,4 @@
 
 </body>
 </html>
+
