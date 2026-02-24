@@ -3,18 +3,15 @@
     --red-dark: #8b0000;
     --gold: #d4af37;
     --bg-paper: #fdfaf6;
-    --text-color: #333;
 }
 
-/* --- CẤU TRÌNH CƠ BẢN --- */
 body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     background: var(--bg-paper);
-    color: var(--text-color);
 }
 
-/* --- BANNER ĐỒNG NHẤT (SỬ DỤNG IMAGE4.JPG) --- */
+/* --- BANNER ĐỒNG NHẤT --- */
 .banner-container {
     width: 100%;
     max-height: 350px;
@@ -51,48 +48,41 @@ body {
     text-transform: uppercase; 
     font-size: 14px; 
     display: inline-block;
-    border: none;
-    background: none;
-    font-family: inherit;
-    cursor: pointer;
 }
 
-/* --- MENU XỔ XUỐNG (DROPDOWN) --- */
-.dropdown {
-    position: relative;
-    display: inline-block;
+/* --- CĂN GIỮ NỘI DUNG TRANG (Sửa lỗi nhảy lề trái) --- */
+.content-section {
+    max-width: 1100px; /* Độ rộng tối đa của nội dung */
+    margin: 40px auto; /* auto ở hai bên giúp căn giữa trang */
+    padding: 0 20px;
 }
 
+/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ (Dành cho pha-he.html) --- */
+#tree-display { 
+    width: 100%; 
+    height: 750px; 
+    background: white; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    overflow: auto; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Style cho các nút (node) trong sơ đồ */
+.node circle { fill: #fff; stroke-width: 2.5px; }
+.node-male circle { stroke: var(--red-dark); } /* Màu đỏ cho Nam */
+.node-female circle { stroke: #ff69b4; } /* Màu hồng cho Nữ */
+.node text { font-size: 14px; font-weight: bold; fill: #333; }
+.link { fill: none; stroke: #ccc; stroke-width: 1.5px; stroke-opacity: 0.6; }
+
+/* Menu xổ xuống */
+.dropdown { position: relative; display: inline-block; }
 .dropdown-content {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
     min-width: 200px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     border-top: 3px solid var(--gold);
 }
-
-.dropdown-content a {
-    color: #333 !important;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-transform: none;
-    font-weight: normal;
-    text-align: left;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-    color: var(--red-dark) !important;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.dropdown:hover .dropbtn, .navbar a:hover {
-    background-color: rgba(255,255,255,0.15);
-    color: var(--gold);
-}
+.dropdown:hover .dropdown-content { display: block; }
