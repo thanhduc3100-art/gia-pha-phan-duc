@@ -132,3 +132,34 @@ footer {
     background: #eee;
     margin-top: 50px;
 }
+/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI --- */
+@media screen and (max-width: 768px) {
+    /* Cho phép menu vuốt ngang trên di động */
+    .navbar {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start !important; /* Căn lề trái để bắt đầu vuốt */
+        padding: 0 10px !important;
+    }
+
+    /* Ngăn thanh menu hiện thanh cuộn xấu xí */
+    .navbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Chỉnh lại các nút menu cho gọn */
+    .navbar a, .navbar .dropbtn {
+        padding: 12px 15px !important;
+        font-size: 14px !important;
+        display: inline-block !important;
+        float: none !important; /* Bỏ float để flexbox hoạt động */
+    }
+
+    /* Chỉnh tiêu đề trang cho đỡ to */
+    h1 {
+        font-size: 1.6rem !important;
+        padding: 10px !important;
+    }
+}
