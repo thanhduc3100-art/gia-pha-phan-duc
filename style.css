@@ -1,0 +1,98 @@
+/* --- BIẾN MÀU SẮC CHỦ ĐẠO --- */
+:root {
+    --red-dark: #8b0000;
+    --gold: #d4af37;
+    --bg-paper: #fdfaf6;
+    --text-color: #333;
+}
+
+/* --- CẤU TRÌNH CƠ BẢN --- */
+body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: var(--bg-paper);
+    color: var(--text-color);
+}
+
+/* --- BANNER ĐỒNG NHẤT (SỬ DỤNG IMAGE4.JPG) --- */
+.banner-container {
+    width: 100%;
+    max-height: 350px;
+    overflow: hidden;
+    background-color: var(--red-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+/* --- THANH MENU (NAVBAR) --- */
+.navbar { 
+    background: var(--red-dark); 
+    display: flex; 
+    justify-content: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+    border-bottom: 4px solid var(--gold); 
+}
+
+.navbar a, .dropdown .dropbtn { 
+    color: white; 
+    text-decoration: none; 
+    padding: 15px 25px; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    font-size: 14px; 
+    display: inline-block;
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* --- MENU XỔ XUỐNG (DROPDOWN) --- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-top: 3px solid var(--gold);
+}
+
+.dropdown-content a {
+    color: #333 !important;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-transform: none;
+    font-weight: normal;
+    text-align: left;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    color: var(--red-dark) !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn, .navbar a:hover {
+    background-color: rgba(255,255,255,0.15);
+    color: var(--gold);
+}
