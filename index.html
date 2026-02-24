@@ -2,53 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
-    <style>
-        /* Định nghĩa màu sắc chủ đạo */
-        :root { --red-dark: #8b0000; --gold: #d4af37; --bg-light: #fffcf8; }
-        body { font-family: 'Roboto', 'Times New Roman', serif; margin: 0; background: var(--bg-light); }
-        h1, h2, .navbar a { font-family: 'Playfair Display', serif; }
-
-        /* --- PHẦN BANNER MỚI THÊM --- */
-        .banner-container {
-            width: 100%;
-            max-height: 350px; /* Chiều cao tối đa của banner, bạn có thể chỉnh số này */
-            overflow: hidden; /* Ẩn phần thừa nếu ảnh quá cao */
-            background-color: var(--red-dark); /* Màu nền phòng khi ảnh chưa tải xong */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .banner-image {
-            width: 100%;
-            height: auto;
-            object-fit: cover; /* Đảm bảo ảnh phủ kín khung mà không bị méo */
-            display: block;
-        }
-        /* --------------------------- */
-        
-        /* Menu chính */
-        .navbar { background: var(--red-dark); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .navbar a { color: white; text-decoration: none; padding: 15px 25px; font-weight: bold; text-transform: uppercase; font-size: 14px; transition: 0.3s; letter-spacing: 1px; }
-        .navbar a:hover { background: rgba(255,255,255,0.15); color: var(--gold); }
-        .navbar a.active { background: var(--gold); color: var(--red-dark); }
-
-        /* Vùng nội dung */
-        .content-section { display: none; padding: 40px 20px; max-width: 1200px; margin: auto; min-height: 60vh; animation: fadeIn 0.5s ease-in-out; }
-        .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .section-header { border-bottom: 3px solid var(--red-dark); color: var(--red-dark); margin-bottom: 30px; padding-bottom: 15px; text-align: center; font-size: 2rem; }
-        
-        /* Đặc thù trang Phả hệ */
-        #tree-display { width: 100%; height: 700px; background: white; border: 2px solid #ddd; border-radius: 8px; overflow: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
-        .node circle { fill: #fff; stroke: var(--red-dark); stroke-width: 2.5px; transition: 0.3s; }
-        .node text { font-size: 14px; font-weight: bold; }
-        .link { fill: none; stroke: #ccc; stroke-width: 1.5px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Trang chủ - Gia phả Phan Đức</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -162,5 +118,6 @@
 
 </body>
 </html>
+
 
 
