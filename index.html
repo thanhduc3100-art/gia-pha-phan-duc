@@ -11,113 +11,44 @@
 <div class="banner-container">
     <img src="image4.jpg" alt="Nhà thờ họ Phan Đức - Chi Hai Phái Nhì" class="banner-image">
 </div>
-<div class="navbar">
-    <a href="test.html">Trang Chủ</a>
+
+<nav class="navbar">
+    <a href="index.html">Trang Chủ</a>
     <a href="lich-su.html">Lịch Sử</a> 
-    <a href="pha-he.html">Phả Đồ</a>
-    <a href="an-tang.html">Thờ Phụng & An Táng</a>
+    <a href="pha-he.html">Phả Hệ</a>
+
+    <div class="dropdown">
+        <button class="dropbtn">Thờ Phụng & An Táng ▼</button>
+        <div class="dropdown-content">
+            <a href="tho-phung.html">Nơi Thờ Phụng</a>
+            <a href="khu-mo.html">Khu Mộ Gia Tộc</a>
+        </div>
+    </div>
+
     <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
     <a href="tin-tuc.html">Tin Tức</a>
     <a href="dong-gop.html">Đóng Góp</a>
-</div>
-</div>
+</nav>
 
-<section id="home" class="content-section active">
+<main class="content-section">
     <h1 class="section-header" style="border:none;">Chào mừng về với Phái Nhì - Chi Hai</h1>
-    <div style="text-align: center; font-style: italic; margin-bottom: 30px; color: #666;">"Cây có cội, nước có nguồn - Chim có tổ, người có tông"</div>
-    <p style="text-align: center; font-size: 1.1rem; line-height: 1.6;">Nơi kết nối tình thân và gìn giữ cội nguồn dòng họ Phan Đức...</p>
-</section>
+    <div style="text-align: center; font-style: italic; margin-bottom: 30px; color: #666;">
+        "Cây có cội, nước có nguồn - Chim có tổ, người có tông"
+    </div>
+    <p style="text-align: center; font-size: 1.1rem; line-height: 1.8;">
+        Nơi kết nối tình thân và gìn giữ cội nguồn dòng họ Phan Đức. <br>
+        Đây là không gian số để con cháu nội ngoại có thể tra cứu phả hệ, tìm hiểu về lịch sử tiên tổ 
+        và cập nhật các hoạt động chung của chi phái.
+    </p>
+</main>
 
-<section id="history" class="content-section">
-    <h2 class="section-header">Lịch sử Dòng họ</h2>
-    <p>Thông tin về cụ Phan Đức Mưu và tổ tiên từ đời thứ 1 đến nay...</p>
-</section>
-
-<section id="tree" class="content-section">
-    <h2 class="section-header">Sơ đồ Phả hệ Trực tuyến</h2>
-    <div id="tree-display"></div>
-</section>
-
-<section id="sacred" class="content-section">
-    <h2 class="section-header">Nơi an táng & Thờ phụng</h2>
-    <ul>
-        <li>Nghĩa trang Trà Am, Huế</li>
-        <li>Nghĩa trang gia đình Phan Đức - Hòa Sơn, Đà Nẵng</li>
-        <li>Nhà thờ phái Hai, Chi Hai - Vỹ Dạ, Huế</li>
-    </ul>
-</section>
-
-<section id="anniversary" class="content-section">
-    <h2 class="section-header">Ngày Giỗ & Kỵ</h2>
-    <p>Danh sách các ngày kỷ niệm quan trọng trong năm của phái...</p>
-</section>
-
-<section id="news" class="content-section">
-    <h2 class="section-header">Tin Tức Dòng Họ</h2>
-    <p>Các hoạt động mới nhất của Ban liên lạc...</p>
-</section>
-
-<section id="donate" class="content-section">
-    <h2 class="section-header">Đóng Góp Xây Dựng Gia Phả</h2>
-    <p>Gửi thông tin, hình ảnh hoặc đóng góp quỹ để duy trì website...</p>
-</section>
-
-<script>
-    // Xử lý chuyển tab
-    function tab(evt, sectionId) {
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.navbar a').forEach(a => a.classList.remove('active'));
-        document.getElementById(sectionId).classList.add('active');
-        evt.currentTarget.classList.add('active');
-        if(sectionId === 'tree') { initTree(); }
-    }
-
-    // Vẽ cây D3 (Logic cũ)
-    async function initTree() {
-        if (document.querySelector("#tree-display svg")) return;
-        const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
-        try {
-            const res = await fetch(`https://opensheet.elk.sh/${SHEET_ID}/giapha1`);
-            const rawData = await res.json();
-            const data = rawData.map(d => ({
-                id: String(d.ID || "").trim(),
-                parentId: String(d.Cha_ID || d.cha || "").trim(),
-                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
-                isWife: String(d.ID).toUpperCase().endsWith('W')
-            })).filter(d => d.id !== "");
-
-            let rootId = data[0].id;
-            const finalData = data.map((d, index) => {
-                if (index === 0) d.parentId = null;
-                else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
-                return d;
-            });
-
-            const width = document.getElementById('tree-display').offsetWidth;
-            const height = finalData.length * 50 + 200;
-            const svg = d3.select("#tree-display").append("svg")
-                .attr("width", width).attr("height", height)
-                .append("g").attr("transform", "translate(150, 40)");
-
-            const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(finalData);
-            d3.tree().size([height - 100, width - 300])(root);
-
-            svg.selectAll(".link").data(root.links()).enter().append("path")
-                .attr("class", "link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
-
-            const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
-                .attr("class", "node").attr("transform", d => `translate(${d.y},${d.x})`);
-
-            node.append("circle").attr("r", 6).style("stroke", d => d.data.isWife ? "#ff69b4" : "#8b0000");
-            node.append("text").attr("dy", "0.35em").attr("x", d => d.children ? -12 : 12)
-                .style("text-anchor", d => d.children ? "end" : "start")
-                .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
-        } catch (e) { console.error(e); }
-    }
-</script>
+<footer style="text-align: center; padding: 20px; color: #888; font-size: 0.9rem;">
+    &copy; 2026 Dòng họ Phan Đức - Chi Hai Phái Nhì
+</footer>
 
 </body>
 </html>
+
 
 
 
