@@ -198,3 +198,12 @@ footer {
     width: 100%;
     text-align: left;
 }
+/* Hiệu ứng ô chữ nhật bao quanh khi ở trang hiện tại */
+.navbar a.active, 
+.dropbtn.active {
+    background-color: rgba(0, 0, 0, 0.3) !important; /* Tạo ô màu tối hơn nền đỏ */
+    color: white !important;
+    font-weight: bold;
+    border-radius: 4px; /* Bo góc nhẹ cho giống hình chữ nhật đẹp */
+    padding: 10px 15px; /* Đảm bảo ô bao quanh vừa vặn chữ */
+}
