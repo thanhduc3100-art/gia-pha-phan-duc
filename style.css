@@ -3,15 +3,17 @@
     --red-dark: #8b0000;
     --gold: #d4af37;
     --bg-paper: #fdfaf6;
+    --text-color: #333;
 }
 
 body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     background: var(--bg-paper);
+    color: var(--text-color);
 }
 
-/* --- BANNER ĐỒNG NHẤT --- */
+/* --- BANNER ĐỒNG NHẤT (Sử dụng image4.jpg) --- */
 .banner-container {
     width: 100%;
     max-height: 350px;
@@ -40,6 +42,7 @@ body {
     border-bottom: 4px solid var(--gold); 
 }
 
+/* Định dạng chung cho link menu và nút dropdown */
 .navbar a, .dropdown .dropbtn { 
     color: white; 
     text-decoration: none; 
@@ -48,16 +51,64 @@ body {
     text-transform: uppercase; 
     font-size: 14px; 
     display: inline-block;
+    /* Loại bỏ định dạng nút mặc định */
+    border: none;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-/* --- CĂN GIỮ NỘI DUNG TRANG (Sửa lỗi nhảy lề trái) --- */
-.content-section {
-    max-width: 1100px; /* Độ rộng tối đa của nội dung */
-    margin: 40px auto; /* auto ở hai bên giúp căn giữa trang */
+.navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: rgba(255,255,255,0.15);
+    color: var(--gold);
+}
+
+/* --- CĂN GIỮ NỘI DUNG TRANG --- */
+.content-section, .container {
+    max-width: 1100px;
+    margin: 40px auto;
     padding: 0 20px;
+    background: white; /* Tạo nền trắng cho nội dung dễ đọc */
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    padding: 30px;
 }
 
-/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ (Dành cho pha-he.html) --- */
+/* --- MENU XỔ XUỐNG (DROPDOWN) --- */
+.dropdown { position: relative; display: inline-block; }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 220px;
+    z-index: 1001;
+    border-top: 3px solid var(--gold);
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Định dạng link bên trong menu xổ xuống */
+.dropdown-content a {
+    color: #333 !important;
+    padding: 12px 20px;
+    text-decoration: none;
+    display: block;
+    text-transform: none; /* Không cần viết hoa toàn bộ */
+    font-weight: normal;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown-content a:last-child { border-bottom: none; }
+
+.dropdown-content a:hover {
+    background-color: #f8f8f8;
+    color: var(--red-dark) !important;
+}
+
+.dropdown:hover .dropdown-content { display: block; }
+
+/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ --- */
 #tree-display { 
     width: 100%; 
     height: 750px; 
@@ -65,24 +116,19 @@ body {
     border: 1px solid #ddd; 
     border-radius: 8px; 
     overflow: auto; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* Style cho các nút (node) trong sơ đồ */
 .node circle { fill: #fff; stroke-width: 2.5px; }
-.node-male circle { stroke: var(--red-dark); } /* Màu đỏ cho Nam */
-.node-female circle { stroke: #ff69b4; } /* Màu hồng cho Nữ */
+.node-male circle { stroke: var(--red-dark); }
+.node-female circle { stroke: #ff69b4; }
 .node text { font-size: 14px; font-weight: bold; fill: #333; }
 .link { fill: none; stroke: #ccc; stroke-width: 1.5px; stroke-opacity: 0.6; }
 
-/* Menu xổ xuống */
-.dropdown { position: relative; display: inline-block; }
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 200px;
-    z-index: 1;
-    border-top: 3px solid var(--gold);
+/* --- FOOTER --- */
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #888;
+    background: #eee;
+    margin-top: 50px;
 }
-.dropdown:hover .dropdown-content { display: block; }
