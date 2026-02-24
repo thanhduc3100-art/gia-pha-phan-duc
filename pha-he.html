@@ -2,73 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phả Hệ - Phan Đức Chi Hai Phái Nhì</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Phả hệ - Phan Đức</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        :root { --red-dark: #8b0000; --gold: #d4af37; --bg: #fdfaf6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); }
-
-     /* Định dạng Banner đồng nhất cho toàn bộ website */
-.banner-container {
-    width: 100%;
-    max-height: 350px; /* Khớp với trang index và lich-su */
-    overflow: hidden;
-    background-color: #8b0000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.banner-image {
-    width: 100%;
-    height: auto; /* Để ảnh tự động co giãn theo chiều rộng */
-    object-fit: cover;
-    display: block;
-}
-
-        /* Menu Navbar */
-        .navbar { 
-            background: var(--red-dark); 
-            display: flex; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            border-bottom: 4px solid var(--gold); 
-        }
-        .navbar a { 
-            color: white; 
-            text-decoration: none; 
-            padding: 15px 25px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            font-size: 14px; 
-            transition: 0.3s;
-        }
-        .navbar a:hover { background: rgba(255,255,255,0.15); color: var(--gold); }
-        .navbar a.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-
-        /* --- KHÔI PHỤC STYLE CÂY PHẢ HỆ --- */
-        #tree-display { 
-            width: 95%; 
-            height: 750px; 
-            margin: 30px auto; 
-            background: white; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            overflow: auto; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        .node circle { fill: #fff; stroke-width: 2.5px; }
-        .node-male circle { stroke: var(--red-dark); } /* Màu đỏ cho Nam */
-        .node-female circle { stroke: #ff69b4; } /* Màu hồng cho Nữ/Vợ */
-        .node text { font-size: 14px; font-weight: bold; fill: #333; }
-        .link { fill: none; stroke: #ccc; stroke-width: 1.5px; stroke-opacity: 0.6; }
-
-        .section-header { text-align: center; color: var(--red-dark); margin-top: 30px; font-size: 1.8rem; }
-    </style>
 </head>
 <body>
 
@@ -155,5 +92,6 @@
     </script>
 </body>
 </html>
+
 
 
