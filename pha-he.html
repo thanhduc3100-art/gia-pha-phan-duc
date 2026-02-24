@@ -67,35 +67,47 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            // 1. Chuyển đổi dữ liệu và làm sạch
-            const data = rawData.map(d => ({
+            // 1. Làm sạch dữ liệu
+            let data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || "").trim(),
                 name: (d.Ho_va_Ten || "Chưa rõ").trim(),
                 isWife: String(d.ID).toUpperCase().endsWith('W')
             })).filter(d => d.id !== "");
 
-            // 2. Tìm danh sách tất cả ID đang có
             const allIds = new Set(data.map(d => d.id));
+            
+            // 2. Tìm những người đang là "Gốc" (không có cha trong danh sách)
+            const roots = data.filter(d => d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId));
 
-            // 3. Xử lý logic Cha-Con để tránh lỗi sập sơ đồ
-            data.forEach(d => {
-                // Nếu Cha_ID không tồn tại trong danh sách ID, thì coi như người này là cụ tổ (Gốc)
-                if (d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId)) {
-                    d.parentId = null; 
-                }
-                // Ngăn lỗi một người tự làm cha chính mình
-                if (d.parentId === d.id) d.parentId = null;
-            });
+            if (roots.length > 1) {
+                // Nếu có nhiều cụ tổ, ta tạo một "Nút Gốc Chung" để gom họ lại
+                const virtualRootId = "VIRTUAL_ROOT";
+                data.push({
+                    id: virtualRootId,
+                    parentId: null,
+                    name: "HỌ PHAN ĐỨC",
+                    isWife: false
+                });
 
-            // 4. Sắp xếp để cụ tổ lên đầu
-            data.sort((a, b) => (a.parentId === null ? -1 : 1));
+                // Trỏ tất cả các cụ tổ hiện tại về Nút Gốc Chung này
+                data.forEach(d => {
+                    if (d.id !== virtualRootId && (d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId))) {
+                        d.parentId = virtualRootId;
+                    }
+                });
+            } else if (roots.length === 1) {
+                // Nếu chỉ có 1 cụ tổ, đặt parentId của cụ đó về null chuẩn theo D3
+                data.forEach(d => {
+                    if (d.id === roots[0].id) d.parentId = null;
+                });
+            }
 
             renderD3(data);
         } catch (e) { 
-            console.error("Lỗi chi tiết:", e); 
+            console.error("Lỗi:", e); 
             document.getElementById('tree-display').innerHTML = 
-                `<p style='text-align:center; color:red;'>Dữ liệu đã thông nhưng chưa vẽ được. <br> Lỗi: ${e.message}</p>`;
+                `<p style='text-align:center; color:red;'>Lỗi cấu trúc dữ liệu: ${e.message}<br>Hãy kiểm tra xem có ai bị trùng ID không.</p>`;
         }
     }
 
@@ -154,4 +166,5 @@
 
 </body>
 </html>
+
 
