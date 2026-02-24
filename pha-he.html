@@ -6,6 +6,29 @@
     <title>Phả Hệ Trực Tuyến - Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* CSS dành riêng cho sơ đồ D3 */
+        #tree-display {
+            width: 100%;
+            overflow-x: auto;
+            background-color: #fdfcf0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .node circle {
+            fill: #fff;
+            stroke-width: 3px;
+        }
+        .node text {
+            font: 14px sans-serif;
+            font-weight: bold;
+        }
+        .link {
+            fill: none;
+            stroke: #8b0000;
+            stroke-width: 2px;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,35 +37,26 @@
 </div>
 
 <nav class="navbar">
-    <a href="index.html" >Trang Chủ</a>
-    <a href="lich-su.html">Lịch Sử</a>
-    <a href="pha-he.html" class="active" >Phả Đồ</a>
-    
-    <a href="thu-vien-anh.html">Thư Viện Ảnh</a>
-
+    <a href="index.html">TRANG CHỦ</a>
+    <a href="lich-su.html">LỊCH SỬ</a>
+    <a href="pha-he.html" class="active">PHẢ ĐỒ</a>
+    <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
     <div class="dropdown">
-        <button class="dropbtn">Thờ Phụng & An Táng ▼</button>
+        <button class="dropbtn">THỜ PHỤNG & AN TÁNG ▼</button>
         <div class="dropdown-content">
             <a href="tho-phung.html">NƠI THỜ PHỤNG</a>
             <a href="khu-mo.html">KHU MỘ GIA TỘC</a>
         </div>
     </div>
-
-    <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
-    <a href="tin-tuc.html">Tin Tức</a>
-    <a href="dong-gop.html">Đóng Góp</a>
+    <a href="ngay-gio.html">NGÀY GIỖ & KỴ</a>
 </nav>
 
 <div class="content-section">
-    <h1 style="text-align: center; color: var(--red-dark); margin-top: 30px;">Sơ Đồ Phả Hệ Chi Hai - Phái Nhì</h1>
-    <p style="text-align: center; font-style: italic; color: #666;">(Bạn có thể cuộn ngang hoặc dọc để xem toàn bộ cây gia phả)</p>
+    <h1 style="text-align: center; color: var(--red-dark); margin-top: 30px;">SƠ ĐỒ PHẢ HỆ CHI HAI - PHÁI NHÌ</h1>
+    <p style="text-align: center; font-style: italic; color: #666;">(Dùng chuột hoặc ngón tay để kéo ngang/dọc xem toàn bộ cây)</p>
     
     <div id="tree-display"></div>
 </div>
-
-<footer>
-    &copy; 2026 Gia phả Phan Đức - Chi Hai Phái Nhì. All rights reserved.
-</footer>
 
 <script>
     const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
@@ -53,7 +67,7 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            // Chuẩn hóa dữ liệu từ Google Sheets
+            // 1. Chuẩn hóa dữ liệu
             const data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || d.cha || "").trim(),
@@ -61,50 +75,73 @@
                 isWife: String(d.ID).toUpperCase().endsWith('W')
             })).filter(d => d.id !== "");
 
-            // Xác định cụ tổ
-            let rootId = data[0].id;
-            const finalData = data.map((d, index) => {
-                if (index === 0) d.parentId = null;
-                else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
-                return d;
+            // 2. Tìm cụ tổ (người không có parentId hoặc parentId không tồn tại trong danh sách ID)
+            const allIds = new Set(data.map(d => d.id));
+            data.forEach(d => {
+                if (!allIds.has(d.parentId)) {
+                    d.parentId = null; // Gốc của cây
+                }
             });
 
-            renderD3(finalData);
+            renderD3(data);
         } catch (e) { 
             console.error("Lỗi tải dữ liệu:", e); 
-            document.getElementById('tree-display').innerHTML = "<p style='text-align:center; color:red;'>Không thể tải dữ liệu phả hệ. Vui lòng kiểm tra lại file Google Sheets.</p>";
+            document.getElementById('tree-display').innerHTML = "<p style='text-align:center; color:red;'>Không thể tải dữ liệu phả hệ. Vui lòng kiểm tra lại Google Sheets.</p>";
         }
     }
 
     function renderD3(data) {
         const container = document.getElementById('tree-display');
-        const width = Math.max(container.offsetWidth, 1200);
-        const height = data.length * 50 + 200;
+        const width = 2000; // Độ rộng rộng rãi để không bị chồng chữ
+        const height = data.length * 40 + 200;
+
+        // Xóa sơ đồ cũ nếu có
+        d3.select("#tree-display").selectAll("*").remove();
 
         const svg = d3.select("#tree-display").append("svg")
             .attr("width", width).attr("height", height)
             .append("g").attr("transform", "translate(150, 50)");
 
-        const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
-        d3.tree().size([height - 100, width - 400])(root);
+        // Tạo cấu trúc cây từ dữ liệu phẳng
+        const root = d3.stratify()
+            .id(d => d.id)
+            .parentId(d => d.parentId)(data);
 
-        // Vẽ đường nối các thế hệ
-        svg.selectAll(".link").data(root.links()).enter().append("path")
+        const treeLayout = d3.tree().size([height - 100, width - 600]);
+        treeLayout(root);
+
+        // Vẽ đường nối
+        svg.selectAll(".link")
+            .data(root.links())
+            .enter().append("path")
             .attr("class", "link")
             .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
-        // Vẽ các nút thành viên
-        const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
+        // Vẽ các nút
+        const node = svg.selectAll(".node")
+            .data(root.descendants())
+            .enter().append("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.y},${d.x})`);
 
-        // Vòng tròn giới tính (Nam: Đỏ, Nữ: Hồng)
+        // Vòng tròn giới tính
         node.append("circle")
-            .attr("r", 7)
+            .attr("r", 6)
             .style("stroke", d => d.data.isWife ? "#ff69b4" : "#8b0000")
-            .style
+            .style("fill", "#fff");
 
+        // Tên thành viên
+        node.append("text")
+            .attr("dy", ".35em")
+            .attr("x", d => d.children ? -15 : 15)
+            .attr("text-anchor", d => d.children ? "end" : "start")
+            .text(d => d.data.name)
+            .style("fill", d => d.data.isWife ? "#c71585" : "#333");
+    }
 
+    // LỆNH QUAN TRỌNG: Chạy hàm khởi tạo cây khi trang web load xong
+    initTree();
+</script>
 
-
-
+</body>
+</html>
