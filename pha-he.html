@@ -2,147 +2,156 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Gia Phả Phan Đức - Chi Hai Phái Nhì</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phả Hệ - Phan Đức Chi Hai Phái Nhì</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    
-        <style>
-    .navbar { 
-        background: #8b0000; /* Màu đỏ đô */
-        display: flex; 
-        justify-content: center; 
-        flex-wrap: wrap; 
-        position: sticky; 
-        top: 0; 
-        z-index: 1000; 
-        border-bottom: 4px solid #d4af37; /* Màu vàng đồng */
-    }
-    .navbar a { 
-        color: white; 
-        text-decoration: none; 
-        padding: 15px 25px; 
-        font-weight: bold; 
-        text-transform: uppercase; 
-        font-size: 14px; 
-    }
-    .navbar a:hover { 
-        background: rgba(255,255,255,0.15); 
-        color: #d4af37; 
-    }
-</style>
-      
+    <style>
+        :root { --red-dark: #8b0000; --gold: #d4af37; --bg: #fdfaf6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); }
+
+        /* --- SỬA LỖI BANNER PHÓNG TO --- */
+        .banner-container {
+            width: 100%;
+            height: 300px; /* Cố định chiều cao để ảnh không bị phóng quá to */
+            overflow: hidden;
+            background: var(--red-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .banner-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Đảm bảo ảnh lấp đầy khung mà không bị méo */
+            object-position: center; /* Giữ tâm bức ảnh (mái nhà thờ) luôn ở giữa */
+        }
+
+        /* Menu Navbar */
+        .navbar { 
+            background: var(--red-dark); 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            border-bottom: 4px solid var(--gold); 
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 15px 25px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            font-size: 14px; 
+            transition: 0.3s;
+        }
+        .navbar a:hover { background: rgba(255,255,255,0.15); color: var(--gold); }
+        .navbar a.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+
+        /* --- KHÔI PHỤC STYLE CÂY PHẢ HỆ --- */
+        #tree-display { 
+            width: 95%; 
+            height: 750px; 
+            margin: 30px auto; 
+            background: white; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            overflow: auto; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .node circle { fill: #fff; stroke-width: 2.5px; }
+        .node-male circle { stroke: var(--red-dark); } /* Màu đỏ cho Nam */
+        .node-female circle { stroke: #ff69b4; } /* Màu hồng cho Nữ/Vợ */
+        .node text { font-size: 14px; font-weight: bold; fill: #333; }
+        .link { fill: none; stroke: #ccc; stroke-width: 1.5px; stroke-opacity: 0.6; }
+
+        .section-header { text-align: center; color: var(--red-dark); margin-top: 30px; font-size: 1.8rem; }
+    </style>
 </head>
 <body>
-<div class="banner-container">
-    <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
-</div>
-<nav class="navbar">
-        <a href="index.html" class="active">Trang Chủ</a> 
+
+    <div class="banner-container">
+        <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html">Trang Chủ</a> 
         <a href="lich-su.html">Lịch Sử</a>
-        <a href="pha-he.html">Phả Đồ</a> 
+        <a href="pha-he.html" class="active">Phả Đồ</a> 
         <a href="an-tang.html">Thờ Phụng & An Táng</a>
         <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
         <a href="tin-tuc.html">Tin Tức</a>
         <a href="dong-gop.html">Đóng Góp</a>
     </nav>
 
-    <section class="content-section">
-        <h1>Chào mừng về với Phái Nhì - Chi Hai</h1>
-        </section>
+    <h2 class="section-header">Sơ đồ Phả hệ Chi Hai - Phái Nhì</h2>
+    
+    <div id="tree-display"></div>
 
-<main>
-    <div id="tree-container"></div>
-    <div id="sidebar">
-        <div class="info-header"><h3 id="side-name">Thông tin chi tiết</h3></div>
-        <p><b>Đời thứ:</b> <span id="side-generation"></span></p>
-        <p><b>Ngày mất:</b> <span id="side-death"></span></p>
-        <p><b>Nơi an táng:</b> <span id="side-burial"></span></p>
-        <p><b>Ghi chú:</b> <div id="side-note" style="font-style: italic; color: #555;"></div></p>
-    </div>
-</main>
+    <script>
+        const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
+        const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/giapha1`;
 
-<script>
-    const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
-    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/giapha1`;
-    let allNodes = [];
+        async function initTree() {
+            try {
+                const res = await fetch(API_URL);
+                const rawData = await res.json();
 
-    async function init() {
-        try {
-            const res = await fetch(API_URL);
-            const rawData = await res.json();
-            
-            const data = rawData.map(d => {
-                const row = {};
-                for (let key in d) row[key.toLowerCase().trim()] = d[key];
-                return {
+                // Chuẩn hóa dữ liệu
+                const data = rawData.map(d => ({
                     id: String(d.ID || "").trim(),
-                    parentId: String(d.Cha_ID || "").trim(),
-                    name: (d.Ho_va_Ten || "Chưa rõ").trim(),
-                    death: row['ngay_mat'] || "Không rõ",
-                    burial: row['noi_an_tang'] || row['an_tang'] || "Chưa cập nhật",
-                    note: row['ghi_chu'] || "Không có",
-                    isWife: String(d.ID).toUpperCase().endsWith('W'),
-                    doi: d.Doi || "?"
-                };
-            }).filter(d => d.id !== "");
+                    parentId: String(d.Cha_ID || d.cha || "").trim(),
+                    name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                    isWife: String(d.ID).toUpperCase().endsWith('W')
+                })).filter(d => d.id !== "");
 
-            // Logic 1 gốc
-            const finalData = data.map((d, i) => {
-                if (i === 0) d.parentId = null;
-                else if (!d.parentId || d.parentId === "0") d.parentId = data[0].id;
-                return d;
-            });
+                // Xử lý để luôn có 1 gốc duy nhất (Cụ Phan Đức Mưu)
+                let rootId = data[0].id;
+                const finalData = data.map((d, index) => {
+                    if (index === 0) d.parentId = null;
+                    else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
+                    return d;
+                });
 
-            renderTree(finalData);
-        } catch (e) { console.error(e); }
-    }
+                renderD3(finalData);
+            } catch (e) { console.error("Lỗi vẽ cây:", e); }
+        }
 
-    function renderTree(data) {
-        const width = 2000, height = data.length * 60;
-        const svg = d3.select("#tree-container").append("svg")
-            .attr("width", "100%").attr("height", "100%")
-            .call(d3.zoom().on("zoom", (e) => g.attr("transform", e.transform)))
-            .append("g");
-        
-        const g = svg.append("g").attr("transform", "translate(150, 50)");
+        function renderD3(data) {
+            const container = document.getElementById('tree-display');
+            const width = Math.max(container.offsetWidth, 1200);
+            const height = data.length * 50 + 200;
 
-        const stratify = d3.stratify().id(d => d.id).parentId(d => d.parentId);
-        const root = stratify(data);
-        const treeLayout = d3.tree().nodeSize([50, 250]);
-        treeLayout(root);
+            const svg = d3.select("#tree-display").append("svg")
+                .attr("width", width).attr("height", height)
+                .append("g").attr("transform", "translate(150, 50)");
 
-        g.selectAll(".link").data(root.links()).enter().append("path")
-            .attr("class", "link")
-            .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+            const stratify = d3.stratify().id(d => d.id).parentId(d => d.parentId);
+            const root = stratify(data);
+            const treeLayout = d3.tree().size([height - 100, width - 400]);
+            treeLayout(root);
 
-        const node = g.selectAll(".node").data(root.descendants()).enter().append("g")
-            .attr("class", d => `node ${d.data.isWife ? 'node-female' : 'node-male'}`)
-            .attr("transform", d => `translate(${d.y},${d.x})`)
-            .on("click", (e, d) => showSidebar(d.data));
+            // Vẽ đường nối
+            svg.selectAll(".link").data(root.links()).enter().append("path")
+                .attr("class", "link")
+                .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
-        node.append("circle").attr("r", 8);
-        node.append("text").attr("dy", "0.35em").attr("x", d => d.children ? -15 : 15)
-            .style("text-anchor", d => d.children ? "end" : "start")
-            .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
-        
-        allNodes = node; // Lưu lại để tìm kiếm
-    }
+            // Vẽ các nút
+            const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
+                .attr("class", d => `node ${d.data.isWife ? 'node-female' : 'node-male'}`)
+                .attr("transform", d => `translate(${d.y},${d.x})`);
 
-    function showSidebar(d) {
-        document.getElementById('sidebar').style.display = 'block';
-        document.getElementById('side-name').innerText = (d.isWife ? "(Bà) " : "Ông ") + d.name;
-        document.getElementById('side-generation').innerText = d.doi;
-        document.getElementById('side-death').innerText = d.death;
-        document.getElementById('side-burial').innerText = d.burial;
-        document.getElementById('side-note').innerText = d.note;
-    }
+            node.append("circle").attr("r", 7);
+            node.append("text")
+                .attr("dy", "0.35em")
+                .attr("x", d => d.children ? -15 : 15)
+                .style("text-anchor", d => d.children ? "end" : "start")
+                .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
+        }
 
-    function searchName(val) {
-        if (!val) { allNodes.style("opacity", 1); return; }
-        allNodes.style("opacity", d => d.data.name.toLowerCase().includes(val.toLowerCase()) ? 1 : 0.1);
-    }
-
-    init();
-</script>
+        initTree();
+    </script>
 </body>
 </html>
 
