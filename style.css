@@ -132,34 +132,50 @@ footer {
     background: #eee;
     margin-top: 50px;
 }
-/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI --- */
+/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI (BẢN SỬA LỖI DROPDOWN) --- */
 @media screen and (max-width: 768px) {
-    /* Cho phép menu vuốt ngang trên di động */
     .navbar {
         display: flex !important;
         overflow-x: auto !important;
         white-space: nowrap !important;
         -webkit-overflow-scrolling: touch;
-        justify-content: flex-start !important; /* Căn lề trái để bắt đầu vuốt */
+        justify-content: flex-start !important;
         padding: 0 10px !important;
     }
 
-    /* Ngăn thanh menu hiện thanh cuộn xấu xí */
     .navbar::-webkit-scrollbar {
         display: none;
     }
 
-    /* Chỉnh lại các nút menu cho gọn */
-    .navbar a, .navbar .dropbtn {
+    /* Biến dropdown thành một phần của hàng ngang */
+    .dropdown {
+        display: flex !important; 
+    }
+
+    /* Ẩn cái nút "Thờ Phụng & An Táng ▼" trên điện thoại vì nó chỉ là tiêu đề nhóm */
+    /* Thay vào đó, chúng ta hiện các mục con trực tiếp ra luôn */
+    .dropbtn {
+        display: none !important;
+    }
+
+    .dropdown-content {
+        display: flex !important; /* Hiện các mục con ra luôn */
+        position: static !important; /* Không cho nó bay lơ lửng nữa, giúp không bị cắt */
+        background: none !important;
+        box-shadow: none !important;
+    }
+
+    .navbar a, .dropdown-content a {
         padding: 12px 15px !important;
         font-size: 14px !important;
         display: inline-block !important;
-        float: none !important; /* Bỏ float để flexbox hoạt động */
+        color: white !important; /* Đảm bảo chữ luôn trắng trên nền đỏ */
+        text-decoration: none;
     }
 
-    /* Chỉnh tiêu đề trang cho đỡ to */
-    h1 {
-        font-size: 1.6rem !important;
-        padding: 10px !important;
+    /* Làm nổi bật mục đang xem trên điện thoại */
+    .navbar a.active, .dropdown-content a.active {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        font-weight: bold;
     }
 }
