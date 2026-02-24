@@ -3,95 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Phả hệ - Phan Đức</title>
+    <title>Phả Hệ Trực Tuyến - Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 
-    <div class="banner-container">
-        <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
+<div class="banner-container">
+    <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
+</div>
+
+<nav class="navbar">
+    <a href="index.html">Trang Chủ</a>
+    <a href="lich-su.html">Lịch Sử</a>
+    <a href="pha-he.html" class="active">Phả Đồ</a>
+
+    <div class="dropdown">
+        <button class="dropbtn">Thờ Phụng & An Táng ▼</button>
+        <div class="dropdown-content">
+            <a href="tho-phung.html">Nơi Thờ Phụng</a>
+            <a href="khu-mo.html">Khu Mộ Gia Tộc</a>
+        </div>
     </div>
 
-    <nav class="navbar">
-        <a href="index.html">Trang Chủ</a> 
-        <a href="lich-su.html">Lịch Sử</a>
-        <a href="pha-he.html" class="active">Phả Đồ</a> 
-        <a href="an-tang.html">Thờ Phụng & An Táng</a>
-        <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
-        <a href="tin-tuc.html">Tin Tức</a>
-        <a href="dong-gop.html">Đóng Góp</a>
-    </nav>
+    <a href="ngay-gio.html">Ngày Giỗ & Kỵ</a>
+    <a href="tin-tuc.html">Tin Tức</a>
+    <a href="dong-gop.html">Đóng Góp</a>
+</nav>
 
-    <h2 class="section-header">Sơ đồ Phả hệ Chi Hai - Phái Nhì</h2>
+<div class="content-section">
+    <h1 style="text-align: center; color: var(--red-dark); margin-top: 30px;">Sơ Đồ Phả Hệ Chi Hai - Phái Nhì</h1>
+    <p style="text-align: center; font-style: italic; color: #666;">(Bạn có thể cuộn ngang hoặc dọc để xem toàn bộ cây gia phả)</p>
     
     <div id="tree-display"></div>
+</div>
 
-    <script>
-        const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
-        const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/giapha1`;
+<footer>
+    &copy; 2026 Gia phả Phan Đức - Chi Hai Phái Nhì. All rights reserved.
+</footer>
 
-        async function initTree() {
-            try {
-                const res = await fetch(API_URL);
-                const rawData = await res.json();
+<script>
+    const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
+    const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/giapha1`;
 
-                // Chuẩn hóa dữ liệu
-                const data = rawData.map(d => ({
-                    id: String(d.ID || "").trim(),
-                    parentId: String(d.Cha_ID || d.cha || "").trim(),
-                    name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
-                    isWife: String(d.ID).toUpperCase().endsWith('W')
-                })).filter(d => d.id !== "");
+    async function initTree() {
+        try {
+            const res = await fetch(API_URL);
+            const rawData = await res.json();
 
-                // Xử lý để luôn có 1 gốc duy nhất (Cụ Phan Đức Mưu)
-                let rootId = data[0].id;
-                const finalData = data.map((d, index) => {
-                    if (index === 0) d.parentId = null;
-                    else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
-                    return d;
-                });
+            // Chuẩn hóa dữ liệu từ Google Sheets
+            const data = rawData.map(d => ({
+                id: String(d.ID || "").trim(),
+                parentId: String(d.Cha_ID || d.cha || "").trim(),
+                name: (d.Ho_va_Ten || d.ten || "Chưa rõ").trim(),
+                isWife: String(d.ID).toUpperCase().endsWith('W')
+            })).filter(d => d.id !== "");
 
-                renderD3(finalData);
-            } catch (e) { console.error("Lỗi vẽ cây:", e); }
+            // Xác định cụ tổ
+            let rootId = data[0].id;
+            const finalData = data.map((d, index) => {
+                if (index === 0) d.parentId = null;
+                else if (d.parentId === "0" || d.parentId === "") d.parentId = rootId;
+                return d;
+            });
+
+            renderD3(finalData);
+        } catch (e) { 
+            console.error("Lỗi tải dữ liệu:", e); 
+            document.getElementById('tree-display').innerHTML = "<p style='text-align:center; color:red;'>Không thể tải dữ liệu phả hệ. Vui lòng kiểm tra lại file Google Sheets.</p>";
         }
+    }
 
-        function renderD3(data) {
-            const container = document.getElementById('tree-display');
-            const width = Math.max(container.offsetWidth, 1200);
-            const height = data.length * 50 + 200;
+    function renderD3(data) {
+        const container = document.getElementById('tree-display');
+        const width = Math.max(container.offsetWidth, 1200);
+        const height = data.length * 50 + 200;
 
-            const svg = d3.select("#tree-display").append("svg")
-                .attr("width", width).attr("height", height)
-                .append("g").attr("transform", "translate(150, 50)");
+        const svg = d3.select("#tree-display").append("svg")
+            .attr("width", width).attr("height", height)
+            .append("g").attr("transform", "translate(150, 50)");
 
-            const stratify = d3.stratify().id(d => d.id).parentId(d => d.parentId);
-            const root = stratify(data);
-            const treeLayout = d3.tree().size([height - 100, width - 400]);
-            treeLayout(root);
+        const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
+        d3.tree().size([height - 100, width - 400])(root);
 
-            // Vẽ đường nối
-            svg.selectAll(".link").data(root.links()).enter().append("path")
-                .attr("class", "link")
-                .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+        // Vẽ đường nối các thế hệ
+        svg.selectAll(".link").data(root.links()).enter().append("path")
+            .attr("class", "link")
+            .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
-            // Vẽ các nút
-            const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
-                .attr("class", d => `node ${d.data.isWife ? 'node-female' : 'node-male'}`)
-                .attr("transform", d => `translate(${d.y},${d.x})`);
+        // Vẽ các nút thành viên
+        const node = svg.selectAll(".node").data(root.descendants()).enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y},${d.x})`);
 
-            node.append("circle").attr("r", 7);
-            node.append("text")
-                .attr("dy", "0.35em")
-                .attr("x", d => d.children ? -15 : 15)
-                .style("text-anchor", d => d.children ? "end" : "start")
-                .text(d => (d.data.isWife ? "(Bà) " : "Ông ") + d.data.name);
-        }
-
-        initTree();
-    </script>
-</body>
-</html>
+        // Vòng tròn giới tính (Nam: Đỏ, Nữ: Hồng)
+        node.append("circle")
+            .attr("r", 7)
+            .style("stroke", d => d.data.isWife ? "#ff69b4" : "#8b0000")
+            .style
 
 
 
