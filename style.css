@@ -4,6 +4,7 @@
     --gold: #d4af37;
     --bg-paper: #fdfaf6;
     --text-color: #333;
+    --active-bg: rgba(0, 0, 0, 0.3); /* Màu ô chữ nhật nổi bật */
 }
 
 body {
@@ -13,7 +14,7 @@ body {
     color: var(--text-color);
 }
 
-/* --- BANNER ĐỒNG NHẤT (Sử dụng image4.jpg) --- */
+/* --- BANNER --- */
 .banner-container {
     width: 100%;
     max-height: 350px;
@@ -42,16 +43,15 @@ body {
     border-bottom: 4px solid var(--gold); 
 }
 
-/* Định dạng chung cho link menu và nút dropdown */
-.navbar a, .dropdown .dropbtn { 
+/* Định dạng chung cho tất cả các mục Menu */
+.navbar a, .navbar .dropbtn { 
     color: white; 
     text-decoration: none; 
-    padding: 15px 25px; 
+    padding: 15px 20px; 
     font-weight: bold; 
     text-transform: uppercase; 
     font-size: 14px; 
     display: inline-block;
-    /* Loại bỏ định dạng nút mặc định */
     border: none;
     background: none;
     font-family: inherit;
@@ -59,22 +59,20 @@ body {
     transition: 0.3s;
 }
 
+/* Hiệu ứng khi di chuột qua */
 .navbar a:hover, .dropdown:hover .dropbtn {
     background-color: rgba(255,255,255,0.15);
     color: var(--gold);
 }
 
-/* --- CĂN GIỮ NỘI DUNG TRANG --- */
-.content-section, .container {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 20px;
-    background: white; /* Tạo nền trắng cho nội dung dễ đọc */
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    padding: 30px;
+/* QUAN TRỌNG: Hiệu ứng ô chữ nhật cho trang hiện tại */
+.navbar a.active, .dropbtn.active {
+    background-color: var(--active-bg) !important;
+    border-radius: 4px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
 }
 
-/* --- MENU XỔ XUỐNG (DROPDOWN) --- */
+/* --- DROPDOWN (MENU CON) --- */
 .dropdown { position: relative; display: inline-block; }
 
 .dropdown-content {
@@ -87,19 +85,15 @@ body {
     box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
 }
 
-/* Định dạng link bên trong menu xổ xuống */
 .dropdown-content a {
     color: #333 !important;
     padding: 12px 20px;
-    text-decoration: none;
     display: block;
-    text-transform: none; /* Không cần viết hoa toàn bộ */
-    font-weight: normal;
+    text-transform: uppercase; /* Cho đồng bộ với menu chính */
+    font-weight: bold;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
-
-.dropdown-content a:last-child { border-bottom: none; }
 
 .dropdown-content a:hover {
     background-color: #f8f8f8;
@@ -108,102 +102,53 @@ body {
 
 .dropdown:hover .dropdown-content { display: block; }
 
-/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ --- */
+/* --- NỘI DUNG TRANG --- */
+.content-section {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ (D3) --- */
 #tree-display { 
     width: 100%; 
-    height: 750px; 
+    height: auto; 
+    min-height: 600px;
     background: white; 
     border: 1px solid #ddd; 
     border-radius: 8px; 
     overflow: auto; 
 }
-
 .node circle { fill: #fff; stroke-width: 2.5px; }
-.node-male circle { stroke: var(--red-dark); }
-.node-female circle { stroke: #ff69b4; }
-.node text { font-size: 14px; font-weight: bold; fill: #333; }
-.link { fill: none; stroke: #ccc; stroke-width: 1.5px; stroke-opacity: 0.6; }
+.node text { font-size: 14px; font-weight: bold; }
+.link { fill: none; stroke: var(--red-dark); stroke-width: 1.5px; opacity: 0.4; }
 
-/* --- FOOTER --- */
-footer {
-    text-align: center;
-    padding: 30px;
-    color: #888;
-    background: #eee;
-    margin-top: 50px;
-}
-/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI (BẢN SỬA LỖI DROPDOWN) --- */
+/* --- TỐI ƯU CHO ĐIỆN THOẠI --- */
 @media screen and (max-width: 768px) {
     .navbar {
-        display: flex !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0 5px;
         -webkit-overflow-scrolling: touch;
-        justify-content: flex-start !important;
-        padding: 0 10px !important;
     }
 
-    .navbar::-webkit-scrollbar {
-        display: none;
-    }
+    /* Ẩn bớt thanh cuộn để menu nhìn gọn hơn */
+    .navbar::-webkit-scrollbar { display: none; }
 
-    /* Biến dropdown thành một phần của hàng ngang */
-    .dropdown {
-        display: flex !important; 
-    }
-
-    /* Ẩn cái nút "Thờ Phụng & An Táng ▼" trên điện thoại vì nó chỉ là tiêu đề nhóm */
-    /* Thay vào đó, chúng ta hiện các mục con trực tiếp ra luôn */
-    .dropbtn {
-        display: none !important;
-    }
-
-    .dropdown-content {
-        display: flex !important; /* Hiện các mục con ra luôn */
-        position: static !important; /* Không cho nó bay lơ lửng nữa, giúp không bị cắt */
-        background: none !important;
-        box-shadow: none !important;
-    }
-
-    .navbar a, .dropdown-content a {
+    .navbar a, .dropbtn {
         padding: 12px 15px !important;
-        font-size: 14px !important;
-        display: inline-block !important;
-        color: white !important; /* Đảm bảo chữ luôn trắng trên nền đỏ */
-        text-decoration: none;
+        font-size: 13px !important;
     }
 
-    /* Làm nổi bật mục đang xem trên điện thoại */
-    .navbar a.active, .dropdown-content a.active {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        font-weight: bold;
+    /* Trên điện thoại, dropdown có thể gây khó bấm, 
+       nếu muốn hiện các mục con ra luôn, bạn giữ nguyên đoạn code dưới */
+    .dropdown:hover .dropdown-content {
+        position: absolute;
+        top: 100%;
     }
 }
-/* Unify all navbar items (Main and Dropdown) */
-.navbar a, 
-.navbar .dropbtn, 
-.dropdown-content a {
-    font-size: 14px !important;    /* Kích thước chữ đồng nhất */
-    font-weight: bold !important;  /* Ép chữ đậm */
-    text-transform: uppercase;     /* Tự động viết hoa nếu bạn quên */
-    padding: 12px 15px;            /* Khoảng cách đệm đều nhau */
-    display: inline-block;
-    color: white;                  /* Màu chữ trắng cho rõ */
-    text-decoration: none;
-}
 
-/* Đảm bảo các mục trong menu con không bị đổi màu nền quá tối */
-.dropdown-content a {
-    background-color: transparent !important; 
-    width: 100%;
-    text-align: left;
-}
-/* Hiệu ứng ô chữ nhật bao quanh khi ở trang hiện tại */
-.navbar a.active, 
-.dropbtn.active {
-    background-color: rgba(0, 0, 0, 0.3) !important; /* Tạo ô màu tối hơn nền đỏ */
-    color: white !important;
-    font-weight: bold;
-    border-radius: 4px; /* Bo góc nhẹ cho giống hình chữ nhật đẹp */
-    padding: 10px 15px; /* Đảm bảo ô bao quanh vừa vặn chữ */
-}
+footer { text-align: center; padding: 30px; color: #888; background: #eee; margin-top: 50px; }
