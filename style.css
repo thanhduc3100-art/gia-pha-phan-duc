@@ -125,29 +125,47 @@ body {
 .node text { font-size: 14px; font-weight: bold; }
 .link { fill: none; stroke: var(--red-dark); stroke-width: 1.5px; opacity: 0.4; }
 
-/* --- TỐI ƯU CHO ĐIỆN THOẠI --- */
+/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI (BẢN TRẢI PHẲNG MENU) --- */
 @media screen and (max-width: 768px) {
     .navbar {
-        justify-content: flex-start;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 0 5px;
+        display: flex !important;
+        overflow-x: auto !important; /* Cho phép vuốt ngang */
+        white-space: nowrap !important;
+        justify-content: flex-start !important;
+        padding: 0 10px !important;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Ẩn bớt thanh cuộn để menu nhìn gọn hơn */
-    .navbar::-webkit-scrollbar { display: none; }
-
-    .navbar a, .dropbtn {
-        padding: 12px 15px !important;
-        font-size: 13px !important;
+    .navbar::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn cho đẹp */
     }
 
-    /* Trên điện thoại, dropdown có thể gây khó bấm, 
-       nếu muốn hiện các mục con ra luôn, bạn giữ nguyên đoạn code dưới */
-    .dropdown:hover .dropdown-content {
-        position: absolute;
-        top: 100%;
+    /* Giấu nút "THỜ PHỤNG & AN TÁNG ▼" trên điện thoại */
+    .dropbtn {
+        display: none !important;
+    }
+
+    /* Đưa các mục con (Nơi thờ phụng, Khu mộ) ra nằm cùng hàng với menu chính */
+    .dropdown-content {
+        display: flex !important;
+        position: static !important; /* Bỏ chế độ bay lơ lửng */
+        background: none !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .navbar a, .dropdown-content a {
+        padding: 12px 15px !important;
+        font-size: 13px !important;
+        display: inline-block !important;
+        color: white !important; /* Đảm bảo chữ luôn trắng trên nền đỏ */
+    }
+
+    /* Hiệu ứng ô hình chữ nhật nổi bật khi ở trang hiện tại */
+    .navbar a.active, .dropdown-content a.active {
+        background-color: var(--active-bg) !important;
+        border-radius: 4px;
+        padding: 8px 12px !important;
     }
 }
 
