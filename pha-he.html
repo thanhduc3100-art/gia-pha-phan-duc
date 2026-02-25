@@ -3,45 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phả Đồ - Phan Đức</title>
+    <title>Phả Đồ Tộc Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Khung chứa cố định không có thanh cuộn */
+        #chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px; /* Độ rộng cố định đẹp cho web */
+            aspect-ratio: 3 / 2; /* Tỷ lệ khung hình giống tấm ảnh 11.jpg */
+            margin: 20px auto;
+            background-image: url('11.jpg');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            overflow: hidden; /* Triệt tiêu thanh cuộn hoàn toàn */
+            border: 3px solid #d4af37;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #tree-viz {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node rect { fill: #fffdf0; stroke: #d4af37; stroke-width: 2px; rx: 5; }
+        .node text { font-size: 12px; font-weight: bold; fill: #8b0000; text-anchor: middle; }
+        .link { fill: none; stroke: #8b4513; stroke-width: 2px; opacity: 0.6; }
+    </style>
 </head>
 <body>
-
-<div class="banner-container">
-    <img src="image4.jpg" alt="Banner Nhà thờ" class="banner-image">
-</div>
 
 <nav class="navbar">
     <a href="index.html">TRANG CHỦ</a>
     <a href="lich-su.html">LỊCH SỬ</a>
     <a href="pha-he.html" class="active">PHẢ ĐỒ</a>
     <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
+    </nav>
 
-    <div class="dropdown">
-        <button class="dropbtn">THỜ PHỤNG & AN TÁNG ▼</button>
-        <div class="dropdown-content">
-            <a href="tho-phung.html">NƠI THỜ PHỤNG</a>
-            <a href="khu-mo.html">KHU MỘ GIA TỘC</a>
-        </div>
-    </div>
-
-    <a href="ngay-gio.html">NGÀY GIỖ & KỴ</a>
-    <a href="tin-tuc.html">TIN TỨC</a>
-    <a href="dong-gop.html">ĐÓNG GÓP</a>
-</nav>
-
-<main class="content-section" style="padding: 0; background: none; box-shadow: none;">
-    <h1 style="text-align: center; color: var(--red-dark); margin: 30px 0;">PHẢ ĐỒ TỘC PHAN ĐỨC</h1>
+<main>
+    <h1 style="text-align: center; color: var(--red-dark); margin-top: 20px;">PHẢ ĐỒ TỘC PHAN ĐỨC</h1>
     
-    <div id="chart-container" style="position: relative; width: 100%; min-height: 800px; background-image: url('11.jpg'); background-size: cover; background-position: center; overflow: auto; border: 2px solid var(--gold); border-radius: 8px;">
-        
-        <div id="tree-viz" style="width: 2500px; height: 1200px;"></div>
-        
+    <div id="chart-container">
+        <div id="tree-viz"></div>
     </div>
-    <p style="text-align: center; margin-top: 15px; color: #666; font-style: italic;">
-        (Sử dụng chuột để kéo hoặc lăn chuột để phóng to/thu nhỏ sơ đồ)
+    
+    <p style="text-align: center; font-style: italic; color: #666;">
+        (Dữ liệu được cập nhật tự động từ Google Sheets)
     </p>
 </main>
 
@@ -54,101 +63,60 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            // 1. Làm sạch dữ liệu
             let data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || "").trim(),
                 name: (d.Ho_va_Ten || "Chưa rõ").trim()
             })).filter(d => d.id !== "");
 
-            // Tìm cụ tổ duy nhất (Phan Đức Mưu)
-            const ancestor = data.find(d => d.parentId === "" || d.parentId === "0");
+            // Tìm gốc duy nhất
+            const rootData = data.find(d => d.parentId === "" || d.parentId === "0");
             const allIds = new Set(data.map(d => d.id));
-
             data.forEach(d => {
-                if (d.id === ancestor.id) {
-                    d.parentId = null;
-                } else if (!allIds.has(d.parentId)) {
-                    d.parentId = ancestor.id; // Chống lỗi đứt nhánh
-                }
+                if (d.id === rootData.id) d.parentId = null;
+                else if (!allIds.has(d.parentId)) d.parentId = rootData.id;
             });
 
-            // 2. Cấu hình D3 Tree
-            const width = 2500;
-            const height = 1200;
-            const nodeWidth = 160;
-            const nodeHeight = 50;
+            // Kích thước ảo bên trong SVG
+            const vWidth = 1000;
+            const vHeight = 667;
 
             const svg = d3.select("#tree-viz").append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .call(d3.zoom().on("zoom", (event) => {
-                    g.attr("transform", event.transform);
-                }))
-                .append("g");
+                .attr("viewBox", `0 0 ${vWidth} ${vHeight}`) // Tự động co giãn theo khung
+                .attr("preserveAspectRatio", "xMidYMid meet")
+                .append("g")
+                .attr("transform", "translate(0, 180)"); // Đẩy cụ tổ xuống dưới phần tiêu đề của ảnh 11.jpg
 
-            const g = svg.append("g").attr("transform", "translate(100, 500)");
-
-            // Mũi tên
-            svg.append("defs").append("marker")
-                .attr("id", "arrow")
-                .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 10)
-                .attr("refY", 0)
-                .attr("orient", "auto")
-                .attr("markerWidth", 6)
-                .attr("markerHeight", 6)
-                .append("path")
-                .attr("d", "M0,-5L10,0L0,5")
-                .attr("fill", "#8b4513");
-
+            const treeLayout = d3.tree().size([vWidth, vHeight - 300]);
             const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
-            const treeLayout = d3.tree().size([height - 200, width - 600]);
             treeLayout(root);
 
-            // Vẽ đường nối (Mũi tên)
-            g.selectAll(".link")
+            // Vẽ đường nối
+            svg.selectAll(".link")
                 .data(root.links())
                 .enter().append("path")
                 .attr("class", "link")
-                .attr("stroke", "#8b4513")
-                .attr("stroke-width", 2)
-                .attr("fill", "none")
-                .attr("marker-end", "url(#arrow)")
-                .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+                .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y));
 
-            // Vẽ khung tên
-            const node = g.selectAll(".node")
+            // Vẽ nút tên
+            const node = svg.selectAll(".node")
                 .data(root.descendants())
                 .enter().append("g")
-                .attr("transform", d => `translate(${d.y},${d.x})`);
+                .attr("transform", d => `translate(${d.x},${d.y})`);
 
             node.append("rect")
-                .attr("width", nodeWidth)
-                .attr("height", nodeHeight)
-                .attr("x", -nodeWidth / 2)
-                .attr("y", -nodeHeight / 2)
-                .attr("rx", 5)
-                .attr("fill", "#fffdf0")
-                .attr("stroke", "#d4af37")
-                .attr("stroke-width", 2);
+                .attr("width", 110).attr("height", 35)
+                .attr("x", -55).attr("y", -17.5);
 
             node.append("text")
                 .attr("dy", "0.35em")
-                .attr("text-anchor", "middle")
-                .attr("fill", "#8b0000")
-                .style("font-weight", "bold")
                 .text(d => d.data.name);
 
         } catch (e) {
             console.error(e);
-            document.getElementById('tree-viz').innerHTML = `<p style="color:red; text-align:center;">Lỗi: ${e.message}</p>`;
         }
     }
     initTree();
 </script>
-
 </body>
 </html>
-
-
