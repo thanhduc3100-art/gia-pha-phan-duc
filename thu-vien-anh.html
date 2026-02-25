@@ -57,19 +57,22 @@
                 const folder = album.Thu_Muc;
                 const total = parseInt(album.So_Luong);
                 const albumTitle = album.Ten_Album;
-                // Lấy nội dung giới thiệu từ cột mới
-                const description = album.Gioi_Thieu || ""; 
-                
+                const description = album.Gioi_thieu || ""; 
+                // LẤY ĐÚNG ẢNH BÌA TỪ CỘT Anh_Bia TRONG SHEETS
+                const coverImage = album.Anh_Bia; 
+
                 html += `
                     <div class="album-card" id="card-${index}" style="background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                         <h3 style="color: var(--red-dark); margin-bottom: 5px; font-size: 1.1rem;">${albumTitle}</h3>
-                        
-                        <p style="font-size: 0.9rem; color: #555; font-style: italic; margin-bottom: 15px; line-height: 1.4;">
-                            ${description}
-                        </p>
+                        <p style="font-size: 0.9rem; color: #555; font-style: italic; margin-bottom: 15px; line-height: 1.4;">${description}</p>
 
                         <div class="photo-list" id="list-${index}">
-                            </div>
+                            <a href="${coverImage}" data-lightbox="album-${index}" data-title="${albumTitle}">
+                                <img src="${coverImage}" 
+                                     onerror="this.parentElement.parentElement.parentElement.style.display='none';"
+                                     style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; cursor: pointer;">
+                            </a>
+                        </div>
                         
                         <div style="display: flex; justify-content: space-between; margin-top: 10px; align-items: center; border-top: 1px solid #eee; padding-top: 10px;">
                             <p style="font-size: 0.8rem; color: #888; margin: 0;">Kho ảnh: ${total} tấm</p>
@@ -78,11 +81,9 @@
                     </div>
                 `;
 
-                // XỬ LÝ NẠP ẢNH VÀ KIỂM TRA LỖI (Giữ nguyên logic thông minh)
+                // NẠP CÁC ẢNH CÒN LẠI TRONG KHO GitHub (Ẩn đi, chỉ hiện khi mở Lightbox)
                 setTimeout(() => {
                     const listContainer = document.getElementById(`list-${index}`);
-                    if (!listContainer) return;
-
                     for (let i = 1; i <= total; i++) {
                         const imgUrl = `${BASE_URL}${folder}/a%20(${i}).jpg`;
                         
@@ -90,21 +91,14 @@
                         a.href = imgUrl;
                         a.setAttribute('data-lightbox', `album-${index}`);
                         a.setAttribute('data-title', `${albumTitle} - ${description}`);
+                        a.style.display = "none"; // Ẩn tất cả ảnh con
                         
                         const img = document.createElement('img');
                         img.src = imgUrl;
+                        // Nếu ảnh bị xóa trên GitHub, xóa luôn thẻ link để Lightbox không bị trắng trang
+                        img.onerror = () => a.remove();
                         
-                        if (i === 1) {
-                            img.style.cssText = "width: 100%; height: 200px; object-fit: cover; border-radius: 4px; cursor: pointer;";
-                            // Nếu ảnh bìa lỗi, ẩn cả card
-                            img.onerror = () => document.getElementById(`card-${index}`).style.display = 'none';
-                            a.appendChild(img);
-                        } else {
-                            a.style.display = "none";
-                            // Nếu ảnh con lỗi, xóa thẻ link để Lightbox không bị trắng trang
-                            img.onerror = () => a.remove();
-                            a.appendChild(img);
-                        }
+                        a.appendChild(img);
                         listContainer.appendChild(a);
                     }
                 }, 100);
