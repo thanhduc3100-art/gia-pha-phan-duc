@@ -11,7 +11,7 @@
             position: relative;
             width: 100%;
             max-width: 1100px;
-            aspect-ratio: 3 / 2.5; /* Tăng chiều cao khung để chứa 4 hàng chữ */
+            aspect-ratio: 3 / 2.5;
             margin: 20px auto;
             background-image: url('11.jpg');
             background-size: 100% 100%;
@@ -60,7 +60,7 @@
             const res = await fetch(API_URL);
             const rawData = await res.json();
 
-            // 1. LẤY DỮ LIỆU (Tách Ngay_Sinh và Ngay_Mat)
+            // 1. LẤY DỮ LIỆU
             let data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || "").trim(),
@@ -71,102 +71,4 @@
             })).filter(d => d.id !== "");
 
             const rootData = data.find(d => d.parentId === "" || d.parentId === "0");
-            const allIds = new Set(data.map(d => d.id));
-            data.forEach(d => {
-                if (d.id === rootData.id) d.parentId = null;
-                else if (!allIds.has(d.parentId)) d.parentId = rootData.id;
-            });
-
-            // 2. CẤU HÌNH KÍCH THƯỚC
-            const vWidth = 1100;
-            const vHeight = 900;
-            const nodeWidth = 140; 
-            const nodeHeight = 90; // Tăng chiều cao để chứa 4 dòng thoải mái
-
-            const svg = d3.select("#tree-viz").append("svg")
-                .attr("viewBox", `0 0 ${vWidth} ${vHeight}`)
-                .attr("preserveAspectRatio", "xMidYMid meet");
-
-            svg.append("defs").append("marker")
-                .attr("id", "arrow")
-                .attr("viewBox", "0 0 10 10")
-                .attr("refX", 10).attr("refY", 5)
-                .attr("markerWidth", 5).attr("markerHeight", 5)
-                .attr("orient", "auto")
-                .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", "#8b4513");
-
-            const g = svg.append("g").attr("transform", "translate(0, 180)");
-
-            // Chừa lề 130px hai bên cho dải đỏ trang trí
-            const treeLayout = d3.tree().size([vWidth - 260, vHeight - 400]);
-            const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
-            treeLayout(root);
-
-            // 3. VẼ ĐƯỜNG NỐI VUÔNG GÓC
-            g.selectAll(".link")
-                .data(root.links())
-                .enter().append("path")
-                .attr("fill", "none")
-                .attr("stroke", "#8b4513")
-                .attr("stroke-width", "1.5px")
-                .attr("marker-end", "url(#arrow)")
-                .attr("d", d => {
-                    const startX = d.source.x + 130;
-                    const startY = d.source.y + (nodeHeight/2);
-                    const endX = d.target.x + 130;
-                    const endY = d.target.y - (nodeHeight/2) - 5;
-                    const midY = (startY + endY) / 2;
-                    return `M${startX},${startY} L${startX},${midY} L${endX},${midY} L${endX},${endY}`;
-                });
-
-            // 4. VẼ HỘP TÊN 4 DÒNG
-            const node = g.selectAll(".node")
-                .data(root.descendants())
-                .enter().append("g")
-                .attr("transform", d => `translate(${d.x + 130},${d.y})`);
-
-            node.append("rect")
-                .attr("width", nodeWidth)
-                .attr("height", nodeHeight)
-                .attr("x", -nodeWidth / 2)
-                .attr("y", -nodeHeight / 2)
-                .attr("fill", "#fffdf0")
-                .attr("stroke", "#d4af37")
-                .attr("stroke-width", "2px");
-
-            const textElement = node.append("text")
-                .attr("text-anchor", "middle")
-                .attr("y", -nodeHeight / 2 + 15);
-
-            // Dòng 1: Định danh
-            textElement.append("tspan")
-                .attr("x", 0).attr("dy", "2px")
-                .attr("fill", "#555").style("font-size", "10px")
-                .text(d => d.data.dinhDanh);
-
-            // Dòng 2: Họ và Tên
-            textElement.append("tspan")
-                .attr("x", 0).attr("dy", "18px")
-                .attr("fill", "#8b0000").style("font-size", "12px").style("font-weight", "bold")
-                .text(d => d.data.name);
-
-            // Dòng 3: Sinh
-            textElement.append("tspan")
-                .attr("x", 0).attr("dy", "18px")
-                .attr("fill", "#666").style("font-size", "10px")
-                .text(d => d.data.sinh ? `S: ${d.data.sinh}` : "");
-
-            // Dòng 4: Mất
-            textElement.append("tspan")
-                .attr("x", 0).attr("dy", "15px")
-                .attr("fill", "#666").style("font-size", "10px")
-                .text(d => d.data.mat ? `M: ${d.data.mat}` : "");
-
-        } catch (e) {
-            console.error(e);
-        }
-    }
-    initTree();
-</script>
-</body>
-</html>
+            const allIds = new
