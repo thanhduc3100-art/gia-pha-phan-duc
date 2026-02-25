@@ -179,25 +179,66 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     border-radius: 4px;
 }
 
-/* Hiệu ứng chuyển động mượt mà cho ảnh bìa */
-.img-wrapper img {
-    transition: transform 0.5s ease; /* Phóng to mượt trong 0.5 giây */
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
-/* Khi di chuột vào Album Card, ảnh bên trong sẽ to lên 15% */
-.album-card:hover .img-wrapper img {
-    transform: scale(1.15); 
-}
 
-/* Thêm một chút bóng đổ khi di chuột vào card cho sinh động */
+/* --- TỔNG HỢP ĐỊNH DẠNG ALBUM CARD --- */
 .album-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .album-card:hover {
-    transform: translateY(-5px); /* Card hơi nhấc lên một chút */
+    transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Cố định tên Album - Chừa sẵn 3 dòng */
+.album-card h3 {
+    color: var(--red-dark);
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    min-height: 4.2em;      /* 1.4 * 3 dòng */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;  /* Cắt sau dòng 3 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Cố định phần giới thiệu - Chừa sẵn 2 dòng */
+.album-desc {
+    font-size: 0.9rem;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    min-height: 2.8em;      /* 1.4 * 2 dòng */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;  /* Cắt sau dòng 2 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hiệu ứng phóng to ảnh bìa */
+.img-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.album-card:hover .img-wrapper img {
+    transform: scale(1.1);
 }
