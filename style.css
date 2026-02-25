@@ -155,6 +155,7 @@ body {
     }
 
     .navbar a, .dropdown-content a {
+        border-bottom: none !important; /* XÓA VIỀN TRẮNG DƯỚI CHỮ */
         padding: 12px 15px !important;
         font-size: 13px !important;
         display: inline-block !important;
