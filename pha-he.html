@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phả Đồ Tộc Phan Đức</title>
+    <title>Phả Đồ - Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        /* Khung chứa cố định khớp với ảnh 11.jpg */
         #chart-container {
             position: relative;
             width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 3 / 2;
+            max-width: 1100px;
+            aspect-ratio: 3 / 2.1;
             margin: 20px auto;
             background-image: url('11.jpg');
             background-size: 100% 100%;
             background-repeat: no-repeat;
-            overflow: hidden;
+            overflow: hidden; /* Không hiện thanh cuộn */
             border: 3px solid #d4af37;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         #tree-viz { width: 100%; height: 100%; }
-        /* Loại bỏ gạch chân menu */
         .navbar a { text-decoration: none; }
     </style>
 </head>
@@ -54,10 +52,6 @@
     <div id="chart-container">
         <div id="tree-viz"></div>
     </div>
-    
-    <p style="text-align: center; font-style: italic; color: #666; margin-bottom: 50px;">
-        (Dữ liệu được cập nhật tự động từ Google Sheets)
-    </p>
 </main>
 
 <script>
@@ -82,60 +76,76 @@
                 else if (!allIds.has(d.parentId)) d.parentId = rootData.id;
             });
 
-            // Kích thước khung ảo (ViewBox)
-            const vWidth = 1000;
-            const vHeight = 667;
+            const vWidth = 1100;
+            const vHeight = 770;
 
             const svg = d3.select("#tree-viz").append("svg")
                 .attr("viewBox", `0 0 ${vWidth} ${vHeight}`)
-                .attr("preserveAspectRatio", "xMidYMid meet")
-                .append("g")
-                .attr("transform", "translate(0, 160)"); // Đẩy cụ tổ xuống dưới rồng phượng
+                .attr("preserveAspectRatio", "xMidYMid meet");
 
-            // Cấu hình khoảng cách giữa các đời (Tree Layout)
-            const treeLayout = d3.tree().size([vWidth, vHeight - 280]);
+            // Tạo Marker Mũi Tên thẳng
+            svg.append("defs").append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 0 10 10")
+                .attr("refX", 10)
+                .attr("refY", 5)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M 0 0 L 10 5 L 0 10 z")
+                .attr("fill", "#8b4513");
+
+            const g = svg.append("g").attr("transform", "translate(0, 180)");
+
+            // Chừa khoảng trống 100px 2 bên cho dải màu đỏ
+            const treeLayout = d3.tree().size([vWidth - 200, vHeight - 350]);
             const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
             treeLayout(root);
 
-            // Vẽ đường nối (Links)
-            svg.selectAll(".link")
+            // Vẽ đường nối VUÔNG GÓC (Orthogonal lines)
+            g.selectAll(".link")
                 .data(root.links())
                 .enter().append("path")
                 .attr("fill", "none")
                 .attr("stroke", "#8b4513")
                 .attr("stroke-width", "2px")
-                .attr("opacity", "0.6")
-                .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y));
+                .attr("marker-end", "url(#arrow)")
+                .attr("d", d => {
+                    // Vẽ đường gấp khúc: Xuống -> Ngang -> Xuống
+                    const startX = d.source.x + 100;
+                    const startY = d.source.y;
+                    const endX = d.target.x + 100;
+                    const endY = d.target.y - 20; // Dừng trước hộp tên một chút để hiện mũi tên
+                    const midY = (startY + endY) / 2;
+                    return `M${startX},${startY} L${startX},${midY} L${endX},${midY} L${endX},${endY}`;
+                });
 
-            // Vẽ các nút tên (Nodes)
-            const node = svg.selectAll(".node")
+            const node = g.selectAll(".node")
                 .data(root.descendants())
                 .enter().append("g")
-                .attr("transform", d => `translate(${d.x},${d.y})`);
+                .attr("transform", d => `translate(${d.x + 100},${d.y})`);
 
-            // Hình chữ nhật (Ép màu trực tiếp để không bị đen)
+            // Hộp tên vuông vức
             node.append("rect")
-                .attr("width", 110)
-                .attr("height", 30)
-                .attr("x", -55)
-                .attr("y", -15)
-                .attr("rx", 4)
-                .attr("fill", "#fffdf0") // Màu vàng kem
-                .attr("stroke", "#d4af37") // Viền vàng kim
-                .attr("stroke-width", "1.5px");
+                .attr("width", 120)
+                .attr("height", 36)
+                .attr("x", -60)
+                .attr("y", -18)
+                .attr("fill", "#fffdf0")
+                .attr("stroke", "#d4af37")
+                .attr("stroke-width", "2px");
 
-            // Chữ tên người
             node.append("text")
                 .attr("dy", "0.35em")
                 .attr("text-anchor", "middle")
-                .attr("fill", "#8b0000") // Màu đỏ đậm
-                .style("font-size", "11px")
+                .attr("fill", "#8b0000")
+                .style("font-size", "12px")
                 .style("font-weight", "bold")
                 .text(d => d.data.name);
 
         } catch (e) {
             console.error(e);
-            document.getElementById('tree-viz').innerHTML = `<p style="color:red; padding: 20px;">Lỗi: ${e.message}</p>`;
         }
     }
     initTree();
