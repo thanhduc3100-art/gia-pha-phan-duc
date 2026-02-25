@@ -56,43 +56,60 @@
             data.forEach((album, index) => {
                 const folder = album.Thu_Muc;
                 const total = parseInt(album.So_Luong);
+                const albumTitle = album.Ten_Album;
                 
-                // 1. Tạo danh sách link ảnh dựa trên quy tắc a (1).jpg
-                let imageLinks = [];
-                for (let i = 1; i <= total; i++) {
-                    imageLinks.push(`${BASE_URL}${folder}/a%20(${i}).jpg`);
-                }
-
-                // 2. Tạo HTML cho mỗi Album Card
-                // Thêm onerror vào ảnh bìa: Nếu ảnh lỗi, ẩn luôn cả album card này
+                // TẠO ALBUM CARD
                 html += `
-                    <div class="album-card" id="album-${index}" style="background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                        <h3 style="color: var(--red-dark); margin-bottom: 10px; font-size: 1.1rem;">${album.Ten_Album}</h3>
+                    <div class="album-card" id="card-${index}" style="background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <h3 style="color: var(--red-dark); margin-bottom: 10px; font-size: 1.1rem;">${albumTitle}</h3>
                         
-                        <a href="${imageLinks[0]}" data-lightbox="album-${index}" data-title="${album.Ten_Album}">
-                            <img src="${album.Anh_Bia}" 
-                                 onerror="document.getElementById('album-${index}').style.display='none';"
-                                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; cursor: pointer;"
-                                 alt="${album.Ten_Album}">
-                        </a>
-
-                        <div style="display: none;">
-                            ${imageLinks.slice(1).map(img => `
-                                <a href="${img}" data-lightbox="album-${index}" data-title="${album.Ten_Album}"></a>
-                            `).join('')}
-                        </div>
+                        <div class="photo-list" id="list-${index}">
+                            </div>
                         
-                        <div style="display: flex; justify-content: space-between; margin-top: 10px; align-items: center;">
-                            <p style="font-size: 0.85rem; color: #666; margin: 0;">Số lượng: ${total} ảnh</p>
-                            <span style="font-size: 0.7rem; color: #999;">Bấm vào ảnh để xem</span>
-                        </div>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">Số lượng tối đa: ${total} ảnh</p>
                     </div>
                 `;
+
+                // XỬ LÝ NẠP ẢNH TỰ ĐỘNG VÀ KIỂM TRA LỖI
+                setTimeout(() => {
+                    const listContainer = document.getElementById(`list-${index}`);
+                    for (let i = 1; i <= total; i++) {
+                        const imgUrl = `${BASE_URL}${folder}/a%20(${i}).jpg`;
+                        
+                        // Tạo thẻ <a> cho Lightbox
+                        const a = document.createElement('a');
+                        a.href = imgUrl;
+                        a.setAttribute('data-lightbox', `album-${index}`);
+                        a.setAttribute('data-title', albumTitle);
+                        
+                        // Tạo ảnh bên trong
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        
+                        // Nếu là ảnh đầu tiên (i=1), dùng làm ảnh bìa
+                        if (i === 1) {
+                            img.style.cssText = "width: 100%; height: 200px; object-fit: cover; border-radius: 4px; cursor: pointer;";
+                            a.appendChild(img);
+                        } else {
+                            // Nếu không phải ảnh đầu, ẩn đi (chỉ dùng cho Lightbox)
+                            a.style.display = "none";
+                            a.appendChild(img);
+                        }
+
+                        // MẸO QUAN TRỌNG: Nếu ảnh bị lỗi (đã xóa), tự động xóa thẻ <a> này
+                        img.onerror = function() {
+                            a.remove(); 
+                            // Nếu là ảnh bìa (i=1) bị lỗi, ẩn luôn cả cái card album
+                            if (i === 1) document.getElementById(`card-${index}`).style.display = 'none';
+                        };
+
+                        listContainer.appendChild(a);
+                    }
+                }, 100);
             });
             document.getElementById('gallery-container').innerHTML = html;
         } catch (error) {
-            console.error("Lỗi tải album:", error);
-            document.getElementById('gallery-container').innerHTML = "<p>Không thể tải dữ liệu từ Google Sheets.</p>";
+            console.error("Lỗi:", error);
         }
     }
 
