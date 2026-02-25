@@ -2,38 +2,15 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Phả Hệ Trực Tuyến - Phan Đức</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phả Đồ - Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        /* CSS dành riêng cho sơ đồ D3 */
-        #tree-display {
-            width: 100%;
-            overflow-x: auto;
-            background-color: #fdfcf0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .node circle {
-            fill: #fff;
-            stroke-width: 3px;
-        }
-        .node text {
-            font: 14px sans-serif;
-            font-weight: bold;
-        }
-        .link {
-            fill: none;
-            stroke: #8b0000;
-            stroke-width: 2px;
-        }
-    </style>
 </head>
 <body>
 
 <div class="banner-container">
-    <img src="image4.jpg" alt="Nhà thờ họ Phan Đức" class="banner-image">
+    <img src="image4.jpg" alt="Banner Nhà thờ" class="banner-image">
 </div>
 
 <nav class="navbar">
@@ -41,6 +18,7 @@
     <a href="lich-su.html">LỊCH SỬ</a>
     <a href="pha-he.html" class="active">PHẢ ĐỒ</a>
     <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
+
     <div class="dropdown">
         <button class="dropbtn">THỜ PHỤNG & AN TÁNG ▼</button>
         <div class="dropdown-content">
@@ -48,15 +26,24 @@
             <a href="khu-mo.html">KHU MỘ GIA TỘC</a>
         </div>
     </div>
+
     <a href="ngay-gio.html">NGÀY GIỖ & KỴ</a>
+    <a href="tin-tuc.html">TIN TỨC</a>
+    <a href="dong-gop.html">ĐÓNG GÓP</a>
 </nav>
 
-<div class="content-section">
-    <h1 style="text-align: center; color: var(--red-dark); margin-top: 30px;">SƠ ĐỒ PHẢ HỆ CHI HAI - PHÁI NHÌ</h1>
-    <p style="text-align: center; font-style: italic; color: #666;">(Dùng chuột hoặc ngón tay để kéo ngang/dọc xem toàn bộ cây)</p>
+<main class="content-section" style="padding: 0; background: none; box-shadow: none;">
+    <h1 style="text-align: center; color: var(--red-dark); margin: 30px 0;">PHẢ ĐỒ TỘC PHAN ĐỨC</h1>
     
-    <div id="tree-display"></div>
-</div>
+    <div id="chart-container" style="position: relative; width: 100%; min-height: 800px; background-image: url('11.jpg'); background-size: cover; background-position: center; overflow: auto; border: 2px solid var(--gold); border-radius: 8px;">
+        
+        <div id="tree-viz" style="width: 2500px; height: 1200px;"></div>
+        
+    </div>
+    <p style="text-align: center; margin-top: 15px; color: #666; font-style: italic;">
+        (Sử dụng chuột để kéo hoặc lăn chuột để phóng to/thu nhỏ sơ đồ)
+    </p>
+</main>
 
 <script>
     const SHEET_ID = "1H5Gi3MXAD6p9tywPmaiz4awtuETRKtK03cR_-bXeLVU";
@@ -71,96 +58,93 @@
             let data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || "").trim(),
-                name: (d.Ho_va_Ten || "Chưa rõ").trim(),
-                isWife: String(d.ID).toUpperCase().endsWith('W')
+                name: (d.Ho_va_Ten || "Chưa rõ").trim()
             })).filter(d => d.id !== "");
 
+            // Tìm cụ tổ duy nhất (Phan Đức Mưu)
+            const ancestor = data.find(d => d.parentId === "" || d.parentId === "0");
             const allIds = new Set(data.map(d => d.id));
-            
-            // 2. Tìm những người đang là "Gốc" (không có cha trong danh sách)
-            const roots = data.filter(d => d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId));
 
-            if (roots.length > 1) {
-                // Nếu có nhiều cụ tổ, ta tạo một "Nút Gốc Chung" để gom họ lại
-                const virtualRootId = "VIRTUAL_ROOT";
-                data.push({
-                    id: virtualRootId,
-                    parentId: null,
-                    name: "HỌ PHAN ĐỨC",
-                    isWife: false
-                });
+            data.forEach(d => {
+                if (d.id === ancestor.id) {
+                    d.parentId = null;
+                } else if (!allIds.has(d.parentId)) {
+                    d.parentId = ancestor.id; // Chống lỗi đứt nhánh
+                }
+            });
 
-                // Trỏ tất cả các cụ tổ hiện tại về Nút Gốc Chung này
-                data.forEach(d => {
-                    if (d.id !== virtualRootId && (d.parentId === "" || d.parentId === "0" || !allIds.has(d.parentId))) {
-                        d.parentId = virtualRootId;
-                    }
-                });
-            } else if (roots.length === 1) {
-                // Nếu chỉ có 1 cụ tổ, đặt parentId của cụ đó về null chuẩn theo D3
-                data.forEach(d => {
-                    if (d.id === roots[0].id) d.parentId = null;
-                });
-            }
+            // 2. Cấu hình D3 Tree
+            const width = 2500;
+            const height = 1200;
+            const nodeWidth = 160;
+            const nodeHeight = 50;
 
-            renderD3(data);
-        } catch (e) { 
-            console.error("Lỗi:", e); 
-            document.getElementById('tree-display').innerHTML = 
-                `<p style='text-align:center; color:red;'>Lỗi cấu trúc dữ liệu: ${e.message}<br>Hãy kiểm tra xem có ai bị trùng ID không.</p>`;
+            const svg = d3.select("#tree-viz").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .call(d3.zoom().on("zoom", (event) => {
+                    g.attr("transform", event.transform);
+                }))
+                .append("g");
+
+            const g = svg.append("g").attr("transform", "translate(100, 500)");
+
+            // Mũi tên
+            svg.append("defs").append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 10)
+                .attr("refY", 0)
+                .attr("orient", "auto")
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("fill", "#8b4513");
+
+            const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
+            const treeLayout = d3.tree().size([height - 200, width - 600]);
+            treeLayout(root);
+
+            // Vẽ đường nối (Mũi tên)
+            g.selectAll(".link")
+                .data(root.links())
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("stroke", "#8b4513")
+                .attr("stroke-width", 2)
+                .attr("fill", "none")
+                .attr("marker-end", "url(#arrow)")
+                .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+
+            // Vẽ khung tên
+            const node = g.selectAll(".node")
+                .data(root.descendants())
+                .enter().append("g")
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+
+            node.append("rect")
+                .attr("width", nodeWidth)
+                .attr("height", nodeHeight)
+                .attr("x", -nodeWidth / 2)
+                .attr("y", -nodeHeight / 2)
+                .attr("rx", 5)
+                .attr("fill", "#fffdf0")
+                .attr("stroke", "#d4af37")
+                .attr("stroke-width", 2);
+
+            node.append("text")
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .attr("fill", "#8b0000")
+                .style("font-weight", "bold")
+                .text(d => d.data.name);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('tree-viz').innerHTML = `<p style="color:red; text-align:center;">Lỗi: ${e.message}</p>`;
         }
     }
-
-    function renderD3(data) {
-        const container = document.getElementById('tree-display');
-        const width = 2000; // Độ rộng rộng rãi để không bị chồng chữ
-        const height = data.length * 40 + 200;
-
-        // Xóa sơ đồ cũ nếu có
-        d3.select("#tree-display").selectAll("*").remove();
-
-        const svg = d3.select("#tree-display").append("svg")
-            .attr("width", width).attr("height", height)
-            .append("g").attr("transform", "translate(150, 50)");
-
-        // Tạo cấu trúc cây từ dữ liệu phẳng
-        const root = d3.stratify()
-            .id(d => d.id)
-            .parentId(d => d.parentId)(data);
-
-        const treeLayout = d3.tree().size([height - 100, width - 600]);
-        treeLayout(root);
-
-        // Vẽ đường nối
-        svg.selectAll(".link")
-            .data(root.links())
-            .enter().append("path")
-            .attr("class", "link")
-            .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
-
-        // Vẽ các nút
-        const node = svg.selectAll(".node")
-            .data(root.descendants())
-            .enter().append("g")
-            .attr("class", "node")
-            .attr("transform", d => `translate(${d.y},${d.x})`);
-
-        // Vòng tròn giới tính
-        node.append("circle")
-            .attr("r", 6)
-            .style("stroke", d => d.data.isWife ? "#ff69b4" : "#8b0000")
-            .style("fill", "#fff");
-
-        // Tên thành viên
-        node.append("text")
-            .attr("dy", ".35em")
-            .attr("x", d => d.children ? -15 : 15)
-            .attr("text-anchor", d => d.children ? "end" : "start")
-            .text(d => d.data.name)
-            .style("fill", d => d.data.isWife ? "#c71585" : "#333");
-    }
-
-    // LỆNH QUAN TRỌNG: Chạy hàm khởi tạo cây khi trang web load xong
     initTree();
 </script>
 
