@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phả Đồ - Phan Đức</title>
+    <title>Phả Đồ Tộc Phan Đức</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
@@ -11,7 +11,7 @@
             position: relative;
             width: 100%;
             max-width: 1100px;
-            aspect-ratio: 3 / 2.5;
+            aspect-ratio: 3 / 2.3;
             margin: 20px auto;
             background-image: url('11.jpg');
             background-size: 100% 100%;
@@ -59,8 +59,10 @@
         try {
             const res = await fetch(API_URL);
             const rawData = await res.json();
+            
+            if (!rawData || rawData.length === 0) throw new Error("Không lấy được dữ liệu từ Sheets");
 
-            // 1. LẤY DỮ LIỆU
+            // 1. CHUẨN HÓA DỮ LIỆU (Đảm bảo khớp tên cột trong Sheets)
             let data = rawData.map(d => ({
                 id: String(d.ID || "").trim(),
                 parentId: String(d.Cha_ID || "").trim(),
@@ -70,5 +72,102 @@
                 mat: (d.Ngay_Mat || "").trim()
             })).filter(d => d.id !== "");
 
-            const rootData = data.find(d => d.parentId === "" || d.parentId === "0");
-            const allIds = new
+            // Tìm Cụ Tổ (người có Cha_ID trống hoặc bằng 0)
+            const rootItem = data.find(d => d.parentId === "" || d.parentId === "0");
+            if (!rootItem) throw new Error("Không tìm thấy Cụ Tổ (Cha_ID phải để trống)");
+
+            const allIds = new Set(data.map(d => d.id));
+            data.forEach(d => {
+                if (d.id === rootItem.id) d.parentId = null;
+                else if (!allIds.has(d.parentId)) d.parentId = rootItem.id; 
+            });
+
+            // 2. THIẾT LẬP SVG
+            const vWidth = 1100;
+            const vHeight = 850;
+            const nodeWidth = 140;
+            const nodeHeight = 90;
+
+            const svg = d3.select("#tree-viz").append("svg")
+                .attr("viewBox", `0 0 ${vWidth} ${vHeight}`)
+                .attr("preserveAspectRatio", "xMidYMid meet");
+
+            // Marker mũi tên thẳng
+            svg.append("defs").append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 0 10 10")
+                .attr("refX", 10).attr("refY", 5)
+                .attr("markerWidth", 5).attr("markerHeight", 5)
+                .attr("orient", "auto")
+                .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", "#8b4513");
+
+            // Dịch chuyển toàn bộ sơ đồ vào vùng trống trung tâm
+            const g = svg.append("g").attr("transform", "translate(0, 180)");
+
+            // Chừa lề 140px cho dải đỏ hai bên
+            const treeLayout = d3.tree().size([vWidth - 280, vHeight - 420]);
+            const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
+            treeLayout(root);
+
+            // 3. VẼ ĐƯỜNG NỐI VUÔNG GÓC (Như hình 12.jpg)
+            g.selectAll(".link")
+                .data(root.links())
+                .enter().append("path")
+                .attr("fill", "none")
+                .attr("stroke", "#8b4513")
+                .attr("stroke-width", "1.5px")
+                .attr("marker-end", "url(#arrow)")
+                .attr("d", d => {
+                    const startX = d.source.x + 140;
+                    const startY = d.source.y + (nodeHeight/2);
+                    const endX = d.target.x + 140;
+                    const endY = d.target.y - (nodeHeight/2) - 5;
+                    const midY = (startY + endY) / 2;
+                    return `M${startX},${startY} L${startX},${midY} L${endX},${midY} L${endX},${endY}`;
+                });
+
+            // 4. VẼ HỘP TÊN 4 DÒNG
+            const node = g.selectAll(".node")
+                .data(root.descendants())
+                .enter().append("g")
+                .attr("transform", d => `translate(${d.x + 140},${d.y})`);
+
+            node.append("rect")
+                .attr("width", nodeWidth)
+                .attr("height", nodeHeight)
+                .attr("x", -nodeWidth / 2)
+                .attr("y", -nodeHeight / 2)
+                .attr("fill", "#fffdf0")
+                .attr("stroke", "#d4af37")
+                .attr("stroke-width", "2px")
+                .attr("rx", 5);
+
+            const text = node.append("text")
+                .attr("text-anchor", "middle")
+                .attr("y", -nodeHeight / 2 + 18);
+
+            // Dòng 1: Định danh
+            text.append("tspan").attr("x", 0).attr("dy", "0")
+                .attr("fill", "#555").style("font-size", "10px").text(d => d.data.dinhDanh);
+
+            // Dòng 2: Họ và Tên (Màu đỏ đậm)
+            text.append("tspan").attr("x", 0).attr("dy", "18px")
+                .attr("fill", "#8b0000").style("font-size", "12px").style("font-weight", "bold").text(d => d.data.name);
+
+            // Dòng 3: Sinh
+            text.append("tspan").attr("x", 0).attr("dy", "18px")
+                .attr("fill", "#666").style("font-size", "10px").text(d => d.data.sinh);
+
+            // Dòng 4: Mất
+            text.append("tspan").attr("x", 0).attr("dy", "15px")
+                .attr("fill", "#666").style("font-size", "10px").text(d => d.data.mat);
+
+        } catch (e) {
+            console.error("Lỗi vẽ phả đồ:", e);
+            document.getElementById('tree-viz').innerHTML = `<p style="color:red; text-align:center; padding-top:100px;">Lỗi hiển thị: ${e.message}<br>Vui lòng kiểm tra lại cột Cha_ID trong Google Sheets.</p>`;
+        }
+    }
+    initTree();
+</script>
+</body>
+</html>
