@@ -242,3 +242,44 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
 .album-card:hover .img-wrapper img {
     transform: scale(1.1);
 }
+/* --- ĐỊNH DẠNG PHẢ ĐỒ TRÊN NỀN CỔ --- */
+
+/* Kiểu dáng cho các "Khung tên" (Nodes) */
+.node rect {
+    fill: #fffdf0; /* Màu nền vàng nhạt kem */
+    stroke: #d4af37; /* Viền màu vàng kim (gold) */
+    stroke-width: 2px;
+    rx: 10px; /* Bo tròn góc nhẹ */
+    ry: 10px;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2)); /* Đổ bóng nhẹ cho nổi */
+}
+
+/* Kiểu dáng chữ trong khung */
+.node text {
+    font: 14px sans-serif;
+    fill: #8b0000; /* Màu chữ đỏ đậm */
+    font-weight: bold;
+    text-anchor: middle; /* Căn giữa chữ */
+}
+
+/* Kiểu dáng chữ chức danh/vai vế (nếu có) */
+.node text.role {
+    font-size: 11px;
+    fill: #555;
+    font-weight: normal;
+}
+
+/* Kiểu dáng đường nối và mũi tên (Links) */
+.link {
+    fill: none;
+    stroke: #8b4513; /* Màu nâu đất/đồng */
+    stroke-width: 2px;
+    stroke-opacity: 0.8;
+}
+
+/* Hiệu ứng khi di chuột vào hộp tên */
+.node:hover rect {
+    fill: #ffffff;
+    stroke: #ff0000;
+    cursor: pointer;
+}
