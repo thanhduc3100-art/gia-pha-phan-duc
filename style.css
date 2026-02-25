@@ -171,3 +171,33 @@ body {
 }
 
 footer { text-align: center; padding: 30px; color: #888; background: #eee; margin-top: 50px; }
+/* Khung chứa ảnh bìa để giới hạn phần ảnh bị phóng to */
+.img-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden; /* Quan trọng: Để ảnh không bị tràn ra ngoài khi to lên */
+    border-radius: 4px;
+}
+
+/* Hiệu ứng chuyển động mượt mà cho ảnh bìa */
+.img-wrapper img {
+    transition: transform 0.5s ease; /* Phóng to mượt trong 0.5 giây */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Khi di chuột vào Album Card, ảnh bên trong sẽ to lên 15% */
+.album-card:hover .img-wrapper img {
+    transform: scale(1.15); 
+}
+
+/* Thêm một chút bóng đổ khi di chuột vào card cho sinh động */
+.album-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.album-card:hover {
+    transform: translateY(-5px); /* Card hơi nhấc lên một chút */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
