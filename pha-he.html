@@ -7,30 +7,24 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        /* Khung chứa cố định không có thanh cuộn */
+        /* Khung chứa cố định khớp với ảnh 11.jpg */
         #chart-container {
             position: relative;
             width: 100%;
-            max-width: 1000px; /* Độ rộng cố định đẹp cho web */
-            aspect-ratio: 3 / 2; /* Tỷ lệ khung hình giống tấm ảnh 11.jpg */
+            max-width: 1000px;
+            aspect-ratio: 3 / 2;
             margin: 20px auto;
             background-image: url('11.jpg');
             background-size: 100% 100%;
             background-repeat: no-repeat;
-            overflow: hidden; /* Triệt tiêu thanh cuộn hoàn toàn */
+            overflow: hidden;
             border: 3px solid #d4af37;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-
-        #tree-viz {
-            width: 100%;
-            height: 100%;
-        }
-
-        .node rect { fill: #fffdf0; stroke: #d4af37; stroke-width: 2px; rx: 5; }
-        .node text { font-size: 12px; font-weight: bold; fill: #8b0000; text-anchor: middle; }
-        .link { fill: none; stroke: #8b4513; stroke-width: 2px; opacity: 0.6; }
+        #tree-viz { width: 100%; height: 100%; }
+        /* Loại bỏ gạch chân menu */
+        .navbar a { text-decoration: none; }
     </style>
 </head>
 <body>
@@ -40,7 +34,19 @@
     <a href="lich-su.html">LỊCH SỬ</a>
     <a href="pha-he.html" class="active">PHẢ ĐỒ</a>
     <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
-    </nav>
+
+    <div class="dropdown">
+        <button class="dropbtn">THỜ PHỤNG & AN TÁNG ▼</button>
+        <div class="dropdown-content">
+            <a href="tho-phung.html">NƠI THỜ PHỤNG</a>
+            <a href="khu-mo.html">KHU MỘ GIA TỘC</a>
+        </div>
+    </div>
+
+    <a href="ngay-gio.html">NGÀY GIỖ & KỴ</a>
+    <a href="tin-tuc.html">TIN TỨC</a>
+    <a href="dong-gop.html">ĐÓNG GÓP</a>
+</nav>
 
 <main>
     <h1 style="text-align: center; color: var(--red-dark); margin-top: 20px;">PHẢ ĐỒ TỘC PHAN ĐỨC</h1>
@@ -49,7 +55,7 @@
         <div id="tree-viz"></div>
     </div>
     
-    <p style="text-align: center; font-style: italic; color: #666;">
+    <p style="text-align: center; font-style: italic; color: #666; margin-bottom: 50px;">
         (Dữ liệu được cập nhật tự động từ Google Sheets)
     </p>
 </main>
@@ -69,7 +75,6 @@
                 name: (d.Ho_va_Ten || "Chưa rõ").trim()
             })).filter(d => d.id !== "");
 
-            // Tìm gốc duy nhất
             const rootData = data.find(d => d.parentId === "" || d.parentId === "0");
             const allIds = new Set(data.map(d => d.id));
             data.forEach(d => {
@@ -77,43 +82,60 @@
                 else if (!allIds.has(d.parentId)) d.parentId = rootData.id;
             });
 
-            // Kích thước ảo bên trong SVG
+            // Kích thước khung ảo (ViewBox)
             const vWidth = 1000;
             const vHeight = 667;
 
             const svg = d3.select("#tree-viz").append("svg")
-                .attr("viewBox", `0 0 ${vWidth} ${vHeight}`) // Tự động co giãn theo khung
+                .attr("viewBox", `0 0 ${vWidth} ${vHeight}`)
                 .attr("preserveAspectRatio", "xMidYMid meet")
                 .append("g")
-                .attr("transform", "translate(0, 180)"); // Đẩy cụ tổ xuống dưới phần tiêu đề của ảnh 11.jpg
+                .attr("transform", "translate(0, 160)"); // Đẩy cụ tổ xuống dưới rồng phượng
 
-            const treeLayout = d3.tree().size([vWidth, vHeight - 300]);
+            // Cấu hình khoảng cách giữa các đời (Tree Layout)
+            const treeLayout = d3.tree().size([vWidth, vHeight - 280]);
             const root = d3.stratify().id(d => d.id).parentId(d => d.parentId)(data);
             treeLayout(root);
 
-            // Vẽ đường nối
+            // Vẽ đường nối (Links)
             svg.selectAll(".link")
                 .data(root.links())
                 .enter().append("path")
-                .attr("class", "link")
+                .attr("fill", "none")
+                .attr("stroke", "#8b4513")
+                .attr("stroke-width", "2px")
+                .attr("opacity", "0.6")
                 .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y));
 
-            // Vẽ nút tên
+            // Vẽ các nút tên (Nodes)
             const node = svg.selectAll(".node")
                 .data(root.descendants())
                 .enter().append("g")
                 .attr("transform", d => `translate(${d.x},${d.y})`);
 
+            // Hình chữ nhật (Ép màu trực tiếp để không bị đen)
             node.append("rect")
-                .attr("width", 110).attr("height", 35)
-                .attr("x", -55).attr("y", -17.5);
+                .attr("width", 110)
+                .attr("height", 30)
+                .attr("x", -55)
+                .attr("y", -15)
+                .attr("rx", 4)
+                .attr("fill", "#fffdf0") // Màu vàng kem
+                .attr("stroke", "#d4af37") // Viền vàng kim
+                .attr("stroke-width", "1.5px");
 
+            // Chữ tên người
             node.append("text")
                 .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .attr("fill", "#8b0000") // Màu đỏ đậm
+                .style("font-size", "11px")
+                .style("font-weight", "bold")
                 .text(d => d.data.name);
 
         } catch (e) {
             console.error(e);
+            document.getElementById('tree-viz').innerHTML = `<p style="color:red; padding: 20px;">Lỗi: ${e.message}</p>`;
         }
     }
     initTree();
