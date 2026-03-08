@@ -5,6 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nhà Thờ 157 Nguyễn Sinh Cung</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tối ưu hiển thị di động - Sửa lỗi chữ bị bóp */
+        @media screen and (max-width: 600px) {
+            .content-section { padding: 10px !important; }
+            .detail-box { padding: 15px !important; }
+            p { text-align: left !important; text-indent: 0 !important; font-size: 1rem !important; }
+        }
+
+        /* Hiệu ứng Xem toàn màn hình cho ảnh chi tiết */
+        .img-zoom-container {
+            position: relative;
+            display: block;
+            margin: 15px auto;
+            cursor: pointer;
+            width: 100%;
+            max-width: 600px;
+        }
+        .fullscreen-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        /* Modal xem ảnh */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            max-width: 95%;
+            max-height: 95%;
+            transition: transform 0.3s;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -22,7 +78,6 @@
             <a href="nha-tho-danang.html">NHÀ THỜ GIA ĐÌNH ĐÀ NẴNG</a>
         </div>
     </div>
-
 
     <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
 
@@ -59,21 +114,80 @@
 
         <h3 style="color: var(--red-dark); margin-bottom: 15px; border-left: 4px solid var(--gold); padding-left: 15px;">CHI TIẾT</h3>
 
-        <div style="background: #fffdf5; padding: 25px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 50px;">
-            <p style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 15px;">
+        <div class="detail-box" style="background: #fffdf5; padding: 25px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 50px;">
+            
+            <p style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 10px;">
                 <strong>I. Nơi thờ phụng chính (Sau bàn Phật):</strong> Thờ ông bà cao tổ, ông bà cao, và các ông cố theo hệ thống gia phả của phái hai, chi hai sau khi đã được tách nhánh. Toàn bộ thông tin được thể hiện chi tiết tại bảng gia phả đặt tại nhà thờ.
             </p>
+            <div class="img-zoom-container" onclick="openImageModal('anh-gia-pha-1.jpg')">
+                <img src="anh-gia-pha-1.jpg" alt="Bảng gia phả tại nhà thờ" style="width: 100%; border-radius: 5px; border: 1px solid var(--gold);">
+                <div class="fullscreen-hint">🔍 Xem toàn màn hình</div>
+            </div>
             
-            <p style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 15px;">
+            <hr style="margin: 30px 0; border: 0; border-top: 1px dashed var(--gold);">
+
+            <p style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 10px;">
                 <strong>II. Nơi thờ phụng bên trái:</strong> Bàn hương phía trước thờ các ông bà. Phía bàn sau dùng làm nơi thờ của gia đình Phan Đức Đại, vợ và các con theo di nguyện của bà Phan Thị Hảo (thông tin được đưa vào bảng gia phả hiện nay tại bàn thờ).
             </p>
-            
-            <p style="line-height: 1.8; font-size: 1.1rem;">
+            <div class="img-zoom-container" onclick="openImageModal('anh-ban-tho-trai.jpg')">
+                <img src="anh-ban-tho-trai.jpg" alt="Nơi thờ phụng bên trái" style="width: 100%; border-radius: 5px; border: 1px solid var(--gold);">
+                <div class="fullscreen-hint">🔍 Xem toàn màn hình</div>
+            </div>
+
+            <hr style="margin: 30px 0; border: 0; border-top: 1px dashed var(--gold);">
+
+            <p style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 10px;">
                 <strong>III. Khu vực bên phải:</strong> Được sử dụng để đặt tủ kinh và làm không gian bàn tiếp khách trang trọng.
             </p>
+            <div class="img-zoom-container" onclick="openImageModal('anh-khu-vuc-khach.jpg')">
+                <img src="anh-khu-vuc-khach.jpg" alt="Khu vực bên phải" style="width: 100%; border-radius: 5px; border: 1px solid var(--gold);">
+                <div class="fullscreen-hint">🔍 Xem toàn màn hình</div>
+            </div>
+
         </div>
     </div>
 </main>
+
+<footer style="text-align: center; margin-top: 80px; padding: 20px; color: #888; border-top: 1px solid #eee;">
+    <p>©2026 Gia đình Phan Đức - Giữ gìn nguồn cội, kết nối tương lai</p>
+</footer>
+
+<div id="imgModal" class="modal" onclick="closeImageModal()">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="imgFullView" ondblclick="toggleZoom(event)">
+</div>
+
+<script>
+    var modal = document.getElementById("imgModal");
+    var modalImg = document.getElementById("imgFullView");
+    var isZoomed = false;
+
+    function openImageModal(src) {
+        modal.style.display = "flex";
+        modalImg.src = src;
+        document.body.style.overflow = "hidden"; // Khóa cuộn trang
+    }
+
+    function closeImageModal() {
+        modal.style.display = "none";
+        modalImg.style.transform = "scale(1)";
+        isZoomed = false;
+        document.body.style.overflow = "auto";
+    }
+
+    function toggleZoom(event) {
+        event.stopPropagation(); // Không cho đóng modal khi nhấn đúp
+        if (!isZoomed) {
+            modalImg.style.transform = "scale(2)";
+            modalImg.style.cursor = "zoom-out";
+            isZoomed = true;
+        } else {
+            modalImg.style.transform = "scale(1)";
+            modalImg.style.cursor = "zoom-in";
+            isZoomed = false;
+        }
+    }
+</script>
 
 </body>
 </html>
