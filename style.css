@@ -43,7 +43,6 @@ body {
     border-bottom: 4px solid var(--gold); 
 }
 
-/* Định dạng chung cho tất cả các mục Menu */
 .navbar a, .navbar .dropbtn { 
     color: white; 
     text-decoration: none; 
@@ -59,13 +58,11 @@ body {
     transition: 0.3s;
 }
 
-/* Hiệu ứng khi di chuột qua */
 .navbar a:hover, .dropdown:hover .dropbtn {
     background-color: rgba(255,255,255,0.15);
     color: var(--gold);
 }
 
-/* QUAN TRỌNG: Hiệu ứng ô chữ nhật cho trang hiện tại */
 .navbar a.active, .dropbtn.active {
     background-color: var(--active-bg) !important;
     border-radius: 4px;
@@ -89,7 +86,7 @@ body {
     color: #333 !important;
     padding: 12px 20px;
     display: block;
-    text-transform: uppercase; /* Cho đồng bộ với menu chính */
+    text-transform: uppercase;
     font-weight: bold;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -102,7 +99,7 @@ body {
 
 .dropdown:hover .dropdown-content { display: block; }
 
-/* --- NỘI DUNG TRANG --- */
+/* --- NỘI DUNG TRANG (MÁY TÍNH) --- */
 .content-section {
     max-width: 1100px;
     margin: 40px auto;
@@ -111,77 +108,70 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-/* --- ĐỊNH DẠNG SƠ ĐỒ PHẢ HỆ (D3) --- */
-#tree-display { 
-    width: 100%; 
-    height: auto; 
-    min-height: 600px;
-    background: white; 
-    border: 1px solid #ddd; 
-    border-radius: 8px; 
-    overflow: auto; 
-}
-.node circle { fill: #fff; stroke-width: 2.5px; }
-.node text { font-size: 14px; font-weight: bold; }
-.link { fill: none; stroke: var(--red-dark); stroke-width: 1.5px; opacity: 0.4; }
-
-/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI (BẢN TRẢI PHẲNG MENU) --- */
+/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI --- */
 @media screen and (max-width: 768px) {
+    /* 1. Sửa lỗi bóp chữ: Mở rộng nội dung ra sát biên */
+    .content-section {
+        margin: 10px auto !important; /* Giảm lề trên dưới */
+        padding: 15px !important;    /* Giảm lề trong từ 30px xuống 15px */
+        width: 95% !important;       /* Tận dụng 95% chiều rộng màn hình */
+    }
+
+    /* 2. Ép các khung Lời Ngỏ, Đóng Góp rộng ra 100% trên mobile */
+    .content-section div[style*="max-width"] {
+        max-width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* 3. Chỉnh sửa Navbar vuốt ngang (Giữ nguyên logic của bạn) */
     .navbar {
         display: flex !important;
-        overflow-x: auto !important; /* Cho phép vuốt ngang */
+        overflow-x: auto !important;
         white-space: nowrap !important;
         justify-content: flex-start !important;
-        padding: 0 10px !important;
+        padding: 0 5px !important;
         -webkit-overflow-scrolling: touch;
     }
 
-    .navbar::-webkit-scrollbar {
-        display: none; /* Ẩn thanh cuộn cho đẹp */
-    }
+    .navbar::-webkit-scrollbar { display: none; }
 
-    /* Giấu nút "THỜ PHỤNG & AN TÁNG ▼" trên điện thoại */
-    .dropbtn {
-        display: none !important;
-    }
+    .dropbtn { display: none !important; }
 
-    /* Đưa các mục con (Nơi thờ phụng, Khu mộ) ra nằm cùng hàng với menu chính */
     .dropdown-content {
         display: flex !important;
-        position: static !important; /* Bỏ chế độ bay lơ lửng */
+        position: static !important;
         background: none !important;
         box-shadow: none !important;
         border: none !important;
     }
 
     .navbar a, .dropdown-content a {
-        border-bottom: none !important; /* XÓA VIỀN TRẮNG DƯỚI CHỮ */
-        padding: 12px 15px !important;
-        font-size: 13px !important;
+        border-bottom: none !important;
+        padding: 10px 12px !important;
+        font-size: 12px !important;
         display: inline-block !important;
-        color: white !important; /* Đảm bảo chữ luôn trắng trên nền đỏ */
+        color: white !important;
     }
 
-    /* Hiệu ứng ô hình chữ nhật nổi bật khi ở trang hiện tại */
-    .navbar a.active, .dropdown-content a.active {
-        background-color: var(--active-bg) !important;
-        border-radius: 4px;
-        padding: 8px 12px !important;
+    /* Đảm bảo chữ trong các trang con không bị canh đều (tránh lỗi giãn chữ quá xa trên mobile) */
+    p {
+        text-align: left !important;
+        text-indent: 0 !important; /* Bỏ thụt đầu dòng để tiết kiệm diện tích trên màn hình hẹp */
+        font-size: 1rem !important;
     }
 }
 
+/* --- CÁC PHẦN CÒN LẠI (GIỮ NGUYÊN) --- */
 footer { text-align: center; padding: 30px; color: #888; background: #eee; margin-top: 50px; }
-/* Khung chứa ảnh bìa để giới hạn phần ảnh bị phóng to */
+
 .img-wrapper {
     width: 100%;
     height: 200px;
-    overflow: hidden; /* Quan trọng: Để ảnh không bị tràn ra ngoài khi to lên */
+    overflow: hidden;
     border-radius: 4px;
 }
 
-
-
-/* --- TỔNG HỢP ĐỊNH DẠNG ALBUM CARD --- */
 .album-card {
     background: #fff;
     padding: 15px;
@@ -197,39 +187,29 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
 }
 
-/* Cố định tên Album - Chừa sẵn 3 dòng */
 .album-card h3 {
     color: var(--red-dark);
     margin: 0 0 5px 0;
     font-size: 1.1rem;
     line-height: 1.4;
-    min-height: 4.2em;      /* 1.4 * 3 dòng */
+    min-height: 4.2em;
     display: -webkit-box;
-    -webkit-line-clamp: 3;  /* Cắt sau dòng 3 */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* Cố định phần giới thiệu - Chừa sẵn 2 dòng */
 .album-desc {
     font-size: 0.9rem;
     color: #555;
     font-style: italic;
     margin-bottom: 15px;
     line-height: 1.4;
-    min-height: 2.8em;      /* 1.4 * 2 dòng */
+    min-height: 2.8em;
     display: -webkit-box;
-    -webkit-line-clamp: 2;  /* Cắt sau dòng 2 */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-}
-
-/* Hiệu ứng phóng to ảnh bìa */
-.img-wrapper {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    border-radius: 4px;
 }
 
 .img-wrapper img {
@@ -242,42 +222,31 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
 .album-card:hover .img-wrapper img {
     transform: scale(1.1);
 }
-/* --- ĐỊNH DẠNG PHẢ ĐỒ TRÊN NỀN CỔ --- */
 
-/* Kiểu dáng cho các "Khung tên" (Nodes) */
+/* --- ĐỊNH DẠNG PHẢ ĐỒ --- */
 .node rect {
-    fill: #fffdf0; /* Màu nền vàng nhạt kem */
-    stroke: #d4af37; /* Viền màu vàng kim (gold) */
+    fill: #fffdf0;
+    stroke: #d4af37;
     stroke-width: 2px;
-    rx: 10px; /* Bo tròn góc nhẹ */
+    rx: 10px;
     ry: 10px;
-    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2)); /* Đổ bóng nhẹ cho nổi */
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
 }
 
-/* Kiểu dáng chữ trong khung */
 .node text {
     font: 14px sans-serif;
-    fill: #8b0000; /* Màu chữ đỏ đậm */
+    fill: #8b0000;
     font-weight: bold;
-    text-anchor: middle; /* Căn giữa chữ */
+    text-anchor: middle;
 }
 
-/* Kiểu dáng chữ chức danh/vai vế (nếu có) */
-.node text.role {
-    font-size: 11px;
-    fill: #555;
-    font-weight: normal;
-}
-
-/* Kiểu dáng đường nối và mũi tên (Links) */
 .link {
     fill: none;
-    stroke: #8b4513; /* Màu nâu đất/đồng */
+    stroke: #8b4513;
     stroke-width: 2px;
     stroke-opacity: 0.8;
 }
 
-/* Hiệu ứng khi di chuột vào hộp tên */
 .node:hover rect {
     fill: #ffffff;
     stroke: #ff0000;
