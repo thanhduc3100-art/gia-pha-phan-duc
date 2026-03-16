@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Tức - Gia đình Phan Đức</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tối ưu hiển thị di động - Sửa lỗi chữ bị bóp */
+        @media screen and (max-width: 600px) {
+            .content-section { padding: 10px !important; }
+            .news-card { padding: 20px !important; }
+            p { text-align: left !important; font-size: 1rem !important; line-height: 1.6 !important; }
+            h2 { font-size: 1.3rem !important; }
+        }
+
+        /* Khung tin tức trang trọng */
+        .news-card {
+            background-color: #fffdf5;
+            border: 1px solid var(--gold);
+            padding: 35px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .news-label {
+            display: inline-block;
+            background: var(--red-dark);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hiệu ứng ảnh xem toàn màn hình */
+        .img-zoom-container {
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+        .fullscreen-hint {
+            position: absolute;
+            bottom: 10px; right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white; padding: 5px 10px;
+            border-radius: 4px; font-size: 0.7rem;
+        }
+
+        /* Modal xem ảnh */
+        .modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center; align-items: center;
+        }
+        .modal-content { max-width: 95%; max-height: 95%; transition: transform 0.3s; }
+        .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="banner-container">
+    <img src="image4.jpg" alt="Banner" class="banner-image">
+</div>
+
+<nav class="navbar">
+    <a href="index.html">TRANG CHỦ</a>
+    
+    <div class="dropdown">
+        <button class="dropbtn">LỊCH SỬ NHÀ THỜ ▼</button>
+        <div class="dropdown-content">
+            <a href="nha-tho-hue.html">NHÀ THỜ 157 NGUYỄN SINH CUNG</a>
+            <a href="nha-tho-danang.html">NHÀ THỜ GIA ĐÌNH ĐÀ NẴNG</a>
+        </div>
+    </div>
+
+    <a href="thu-vien-anh.html">THƯ VIỆN ẢNH</a>
+
+    <div class="dropdown">
+        <button class="dropbtn">THỜ PHỤNG & AN TÁNG ▼</button>
+        <div class="dropdown-content">
+            <a href="tho-phung.html">NƠI THỜ PHỤNG</a>
+            <a href="khu-mo.html">KHU MỘ GIA TỘC</a>
+        </div>
+    </div>
+
+    <a href="ngay-gio.html">NGÀY GIỖ & KỴ</a>
+    <a href="tin-tuc.html" class="active">TIN TỨC</a>
+    <a href="dong-gop.html">ĐÓNG GÓP</a>
+</nav>
+
+<main class="content-section">
+    <h1 style="color: var(--red-dark); text-align: center; margin-top: 20px;">TIN TỨC & SỰ KIỆN GIA ĐÌNH</h1>
+    <hr style="border: 1px solid var(--gold); width: 20%; margin-bottom: 40px;">
+
+    <div style="max-width: 950px; margin: 0 auto; padding: 0 20px;">
+
+        <div class="news-card">
+            <div class="news-label">Sự kiện năm 2021</div>
+            <h2 style="color: var(--red-dark); margin-top: 0;">1. Nâng cấp khu mộ dời-Núi Thiên Thai</h2>
+            <div style="line-height: 1.8; text-align: justify; font-size: 1.1rem; color: #333;">
+                <p>Năm 2021 được nâng cấp nền lát gạch block, quét Kova toàn khu mộ và kẻ lại toàn bộ bia đá, bỏ đá vào các nấm mộ;</p>
+                <p><strong>Tổng kinh phí:</strong> 70 triệu ( do bác <strong>Phan Đức Thắng</strong> đầu tư)</p>
+            </div>
+            <div class="img-zoom-container" onclick="openImageModal('anh-khu-mo-thien-thai.jpg')">
+                <img src="anh-khu-mo-thien-thai.jpg" alt="Khu mộ Núi Thiên Thai" style="width: 100%; border-radius: 8px; border: 1px solid var(--gold);">
+                <div class="fullscreen-hint">🔍 Xem ảnh toàn màn hình</div>
+            </div>
+        </div>
+
+        <div class="news-card">
+            <div class="news-label">Sự kiện năm 2026</div>
+            <h2 style="color: var(--red-dark); margin-top: 0;">2. Nâng cấp khu mộ - Trà Am</h2>
+            <div style="line-height: 1.8; text-align: justify; font-size: 1.1rem; color: #333;">
+                <p>Năm 2026 Ngày 2/3 Âm lịch năm Bính Ngọ, đổ bê tông và lát gạch block tại khu mộ cao Tổ, quét Kova toàn khu mộ, kẻ lại 2 câu đối và bia, bỏ đá sỏi toàn bộ khu mộ tại Trà Am.</p>
+                <p><strong>Tổng kinh phí:</strong> 70,5 triệu đồng, do các anh em con ông <strong>Phan Đức Luận</strong> đầu tư, hoàn thành 15/4 Âm lịch.</p>
+            </div>
+            <div class="img-zoom-container" onclick="openImageModal('anh-khu-mo-tra-am.jpg')">
+                <img src="anh-khu-mo-tra-am.jpg" alt="Khu mộ Trà Am" style="width: 100%; border-radius: 8px; border: 1px solid var(--gold);">
+                <div class="fullscreen-hint">🔍 Xem ảnh toàn màn hình</div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer style="text-align: center; margin-top: 80px; padding: 20px; color: #888; border-top: 1px solid #eee;">
+    <p>©2026 Gia đình Phan Đức - Giữ gìn nguồn cội, kết nối tương lai</p>
+</footer>
+
+<div id="imgModal" class="modal" onclick="closeImageModal()">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="imgFullView" ondblclick="toggleZoom(event)">
+</div>
+
+<script>
+    var modal = document.getElementById("imgModal");
+    var modalImg = document.getElementById("imgFullView");
+    var isZoomed = false;
+
+    function openImageModal(src) {
+        modal.style.display = "flex";
+        modalImg.src = src
