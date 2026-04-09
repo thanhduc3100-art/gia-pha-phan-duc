@@ -316,42 +316,92 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     font-weight: bold;
     cursor: pointer;
 }
-/* --- CẬP NHẬT BANNER SLIDE TỐI ƯU ẢNH --- */
-.banner-container {
+/* --- Cấu hình khung chứa chung --- */
+.banner-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+/* =========================================
+   1. BANNER DÀNH CHO MÁY TÍNH (Màn hình lớn)
+   ========================================= */
+.desktop-banner {
+  display: block;
+  width: 100%;
+  height: 450px; /* Bạn thay đổi chiều cao này cho hợp với máy tính */
+  position: relative;
+  overflow: hidden;
+}
+
+.desktop-slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  /* Chạy 2 ảnh, mỗi ảnh xuất hiện 4 giây -> Tổng chu kỳ 8 giây */
+  animation: fadeDesktop 8s infinite; 
+}
+
+/* Gắn tên file ảnh cho máy tính */
+.d-slide-1 { background-image: url('image4.jpg'); animation-delay: 0s; }
+.d-slide-2 { background-image: url('slide5.jpg'); animation-delay: 4s; }
+
+/* Hiệu ứng mờ dần cho 2 ảnh */
+@keyframes fadeDesktop {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  40%  { opacity: 1; }
+  50%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Mặc định ẩn banner điện thoại trên máy tính */
+.mobile-banner {
+  display: none; 
+}
+
+/* =========================================
+   2. BANNER DÀNH CHO ĐIỆN THOẠI (Màn hình dưới 768px)
+   ========================================= */
+@media (max-width: 768px) {
+  
+  .desktop-banner {
+    display: none; /* Ẩn banner máy tính khi lướt bằng điện thoại */
+  }
+
+  .mobile-banner {
+    display: block; /* Hiện khối 4 ảnh lên */
     width: 100%;
-    /* Tăng độ cao để phù hợp với ảnh 4:3 của bạn */
-    height: 400px; 
-    overflow: hidden;
+    height: 300px; /* Bạn thay đổi chiều cao này cho hợp với điện thoại */
     position: relative;
-    background-color: #f4f4f4;
-}
+    overflow: hidden;
+  }
 
-.slide {
-    width: 100%;
-    height: 100%;
+  .mobile-slide {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
     opacity: 0;
-    transition: opacity 1.5s ease-in-out;
-}
+    /* Chạy 4 ảnh, mỗi ảnh xuất hiện 4 giây -> Tổng chu kỳ 16 giây */
+    animation: fadeMobile 16s infinite; 
+  }
 
-.slide.active {
-    opacity: 1;
-}
+  /* Gắn đúng 4 tên file ảnh bạn yêu cầu cho mobile */
+  .m-slide-1 { background-image: url('image4.jpg'); animation-delay: 0s; }
+  .m-slide-2 { background-image: url('slide2.jpg'); animation-delay: 4s; }
+  .m-slide-3 { background-image: url('slide3.jpg'); animation-delay: 8s; }
+  .m-slide-4 { background-image: url('slide4.jpg'); animation-delay: 12s; }
 
-.slide img {
-    width: 100%;
-    height: 100%;
-    /* Giữ tỷ lệ ảnh, cắt bớt phần thừa nhưng không làm méo hình */
-    object-fit: cover; 
-    /* Ưu tiên hiển thị phần giữa của bức tranh */
-    object-position: center; 
-}
-
-/* Điều chỉnh riêng cho điện thoại để không chiếm quá nửa màn hình */
-@media screen and (max-width: 600px) {
-    .banner-container {
-        height: 280px; /* Độ cao vừa phải trên di động */
-    }
+  /* Hiệu ứng mờ dần chia tỷ lệ cho 4 ảnh */
+  @keyframes fadeMobile {
+    0%   { opacity: 0; }
+    5%   { opacity: 1; }
+    20%  { opacity: 1; }
+    25%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
 }
