@@ -320,7 +320,7 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
 .banner-container {
     width: 100%;
     /* Tăng độ cao để phù hợp với ảnh 4:3 của bạn */
-    height: 500px; 
+    height: 400px; 
     overflow: hidden;
     position: relative;
     background-color: #f4f4f4;
