@@ -316,3 +316,31 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     font-weight: bold;
     cursor: pointer;
 }
+/* --- CODE CHO BANNER SLIDE --- */
+.banner-container {
+    width: 100%;
+    height: 350px; /* Bạn có thể chỉnh độ cao tùy ý */
+    overflow: hidden;
+    position: relative;
+    background-color: #000;
+}
+
+.slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out; /* Tốc độ mờ dần */
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Giúp ảnh không bị méo */
+}
