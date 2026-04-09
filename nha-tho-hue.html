@@ -64,8 +64,20 @@
 </head>
 <body>
 
-<div class="banner-container">
-    <img src="image4.jpg" alt="Banner Nhà thờ" class="banner-image">
+<div class="banner-wrapper">
+  
+  <div class="desktop-banner">
+    <div class="desktop-slide d-slide-1"></div>
+    <div class="desktop-slide d-slide-2"></div>
+  </div>
+
+  <div class="mobile-banner">
+    <div class="mobile-slide m-slide-1"></div>
+    <div class="mobile-slide m-slide-2"></div>
+    <div class="mobile-slide m-slide-3"></div>
+    <div class="mobile-slide m-slide-4"></div>
+  </div>
+
 </div>
 
 <nav class="navbar">
@@ -191,6 +203,22 @@
         }
     }
 </script>
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
 
+    function nextSlide() {
+        // Kiểm tra nếu có slide thì mới chạy (tránh lỗi)
+        if (slides.length === 0) return;
+        
+        slides[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide + 1) % totalSlides;
+        slides[currentSlide].classList.add("active");
+    }
+
+    // Tự động chuyển sau mỗi 4 giây
+    setInterval(nextSlide, 4000);
+</script>
 </body>
 </html>
