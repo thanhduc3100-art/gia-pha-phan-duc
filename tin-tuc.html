@@ -65,8 +65,20 @@
 </head>
 <body>
 
-<div class="banner-container">
-    <img src="image4.jpg" alt="Banner" class="banner-image">
+<div class="banner-wrapper">
+  
+  <div class="desktop-banner">
+    <div class="desktop-slide d-slide-1"></div>
+    <div class="desktop-slide d-slide-2"></div>
+  </div>
+
+  <div class="mobile-banner">
+    <div class="mobile-slide m-slide-1"></div>
+    <div class="mobile-slide m-slide-2"></div>
+    <div class="mobile-slide m-slide-3"></div>
+    <div class="mobile-slide m-slide-4"></div>
+  </div>
+
 </div>
 
 <nav class="navbar">
@@ -146,4 +158,46 @@
 
     function openImageModal(src) {
         modal.style.display = "flex";
-        modalImg.src = src
+        modalImg.src = src;
+        document.body.style.overflow = "hidden"; // Khóa cuộn trang khi xem ảnh
+    }
+
+    function closeImageModal() {
+        modal.style.display = "none";
+        modalImg.style.transform = "scale(1)";
+        isZoomed = false;
+        document.body.style.overflow = "auto"; // Mở lại cuộn trang
+    }
+
+    function toggleZoom(event) {
+        event.stopPropagation(); // Không cho đóng modal khi nhấn đúp
+        if (!isZoomed) {
+            modalImg.style.transform = "scale(2)";
+            modalImg.style.cursor = "zoom-out";
+            isZoomed = true;
+        } else {
+            modalImg.style.transform = "scale(1)";
+            modalImg.style.cursor = "zoom-in";
+            isZoomed = false;
+        }
+    }
+</script>
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
+
+    function nextSlide() {
+        // Kiểm tra nếu có slide thì mới chạy (tránh lỗi)
+        if (slides.length === 0) return;
+        
+        slides[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide + 1) % totalSlides;
+        slides[currentSlide].classList.add("active");
+    }
+
+    // Tự động chuyển sau mỗi 4 giây
+    setInterval(nextSlide, 4000);
+</script>
+</body>
+</html>
