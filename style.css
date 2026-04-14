@@ -405,3 +405,38 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     100% { opacity: 0; }
   }
 }
+/* 1. Khai báo màu vàng Gold nếu bạn chưa có */
+:root {
+    --gold: #d4af37; /* Bạn có thể chỉnh lại màu vàng đậm nhạt tùy ý */
+}
+
+/* 2. Căn chỉnh cho danh sách (ul) */
+.genealogy-content ul {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding-left: 25px; /* Tạo khoảng trống vừa đủ cho dấu chấm */
+}
+
+.genealogy-content li {
+    margin-bottom: 12px;
+    list-style-type: none; /* Tắt dấu chấm mặc định để dùng dấu chấm đẹp hơn */
+    position: relative;
+}
+
+/* 3. Tạo dấu bullet point màu Gold cho đồng bộ */
+.genealogy-content li::before {
+    content: "•";
+    color: var(--gold);
+    font-weight: bold;
+    display: inline-block; 
+    width: 1em;
+    margin-left: -1em;
+    position: absolute;
+    font-size: 1.3rem;
+    top: -2px;
+}
+
+/* 4. Làm đậm tiêu đề phụ trong list */
+.genealogy-content li strong {
+    color: #000; /* Hoặc để màu #8b0000 nếu muốn nổi bật kiểu truyền thống */
+}
