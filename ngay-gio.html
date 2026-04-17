@@ -54,6 +54,136 @@
     <h1 style="color: var(--red-dark); text-align: center; margin-top: 20px;">Ngày giỗ, kỵ trong năm:</h1>
     <hr style="border: 1px solid var(--gold); width: 20%; margin-bottom: 40px;">
 
+<style>
+    .family-calendar-app {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 25px;
+        max-width: 450px;
+        margin: 0 auto 50px auto; /* Căn giữa và tạo khoảng cách với phần dưới */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
+    .calendar-icon-wrapper {
+        background: #f8f9fa;
+        width: 65px; height: 65px; border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; margin: 0 auto 20px auto;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
+    .date-display-section { margin-bottom: 25px; }
+    .solar-date-large { color: #1a1a1a; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .lunar-label {
+        background: #f0f0f2; color: #777; font-size: 0.75rem; font-weight: bold;
+        padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 8px;
+    }
+    .lunar-date-text { color: #333; font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+    .can-chi-year { color: #888; font-size: 0.95rem; }
+    .divider-line-widget { border: 0; border-top: 1px solid #f0f0f0; margin: 25px -25px 20px -25px; }
+    .events-30day-header {
+        text-align: left; font-size: 0.9rem; font-weight: bold; color: #555;
+        margin-bottom: 15px; display: flex; align-items: center; gap: 8px; padding-left: 5px;
+    }
+    .events-30day-header::before { content: "●"; color: #f7a62d; }
+    .app-event-card {
+        background: #ffffff; border-radius: 15px; padding: 15px; margin-bottom: 12px;
+        display: flex; align-items: center; justify-content: space-between;
+        border: 1px solid #f5f5f5; transition: all 0.2s ease;
+    }
+    .app-event-icon-box {
+        width: 48px; height: 48px; border-radius: 12px;
+        background-color: #f0f9f1; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .app-event-info { flex: 1; text-align: left; padding-left: 15px; }
+    .app-event-name { margin: 0; color: #1a1a1a; font-size: 1rem; font-weight: 600; }
+    .app-event-lunar { margin: 2px 0 0; color: #888; font-size: 0.85rem; }
+    .app-event-countdown { text-align: right; }
+    .app-countdown-number { font-size: 1rem; font-weight: bold; color: #2e7d32; display: block; }
+    .app-countdown-text { font-size: 0.7rem; color: #bbb; text-transform: uppercase; }
+    .hidden-widget { display: none; }
+</style>
+
+<div class="family-calendar-app">
+    <div class="calendar-icon-wrapper">📅</div>
+    <div class="date-display-section">
+        <div id="date-solar-app" class="solar-date-large">Đang tải...</div>
+        <div class="lunar-label">ÂM LỊCH</div>
+        <div id="date-lunar-app" class="lunar-date-text"></div>
+        <div id="year-can-chi" class="can-chi-year"></div>
+    </div>
+    <div id="filtered-events-container" class="hidden-widget">
+        <hr class="divider-line-widget">
+        <div class="events-30day-header">SỰ KIỆN 30 NGÀY TỚI (<span id="event-count">0</span>)</div>
+        <div id="countdown-list-app"></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const apiKey = "al_jj6v21v0sjqd81ewsp";
+
+        const weekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        document.getElementById('date-solar-app').innerText = `${weekdays[today.getDay()]}, ${today.getDate()} tháng ${today.getMonth() + 1}, ${today.getFullYear()}`;
+
+        fetch(`https://apiamlich.thuc.me/api/today?key=${apiKey}`)
+            .then(res => res.json())
+            .then(res => {
+                if(res.success && res.data) {
+                    const lunar = res.data.lunar;
+                    const canChi = res.data.can_chi;
+                    const prefix = lunar.day < 10 ? "Mùng " : "";
+                    document.getElementById('date-lunar-app').innerText = `${prefix}${lunar.day} tháng ${lunar.month}`;
+                    document.getElementById('year-can-chi').innerText = `Năm ${canChi.year}`;
+                }
+            }).catch(err => console.error(err));
+
+        const lunarEvents = [
+            { name: "Giỗ Ông Cao Tổ Phan Đức Mưu", sDate: "2026-02-18", lDate: "2/1", icon: "🕯️" },
+            { name: "Giỗ ông Phan Đức Thương", sDate: "2026-05-02", lDate: "16/3", icon: "🕯️" },
+            { name: "Tưởng niệm cháu Phú Quý", sDate: "2026-05-24", lDate: "8/4", icon: "🕯️" },
+            { name: "Chạp hiệp kỵ Chi hai", sDate: "2026-05-31", lDate: "15/4", icon: "🙏" },
+            { name: "Tưởng niệm em Trí", sDate: "2026-06-16", lDate: "2/5", icon: "🕯️" },
+            { name: "Tưởng niệm em Hải", sDate: "2026-06-22", lDate: "8/5", icon: "🕯️" },
+            { name: "Lễ Vu Lan", sDate: "2026-08-27", lDate: "15/7", icon: "🌸" },
+            { name: "Hiệp kỵ", sDate: "2026-10-14", lDate: "5/9", icon: "🙏" },
+            { name: "Giỗ bà Trần Thị Dung", sDate: "2026-12-16", lDate: "8/11", icon: "🕯️" },
+            { name: "Kỵ bà Phan Thị Hảo & Phan Thị Thảo", sDate: "2027-01-14", lDate: "7/12", icon: "🕯️" }
+        ];
+
+        const listEl = document.getElementById('countdown-list-app');
+        const container = document.getElementById('filtered-events-container');
+        let count = 0;
+
+        lunarEvents.forEach(ev => {
+            const dEv = new Date(ev.sDate);
+            dEv.setHours(0,0,0,0);
+            const diff = Math.ceil((dEv - today) / (1000 * 3600 * 24));
+            if (diff >= 0 && diff <= 30) {
+                count++;
+                container.classList.remove('hidden-widget');
+                listEl.innerHTML += `
+                    <div class="app-event-card">
+                        <div class="app-event-icon-box">${ev.icon}</div>
+                        <div class="app-event-info">
+                            <h4 class="app-event-name">${ev.name}</h4>
+                            <p class="app-event-lunar">${ev.lDate} Âm lịch (DL: ${ev.sDate.split('-').reverse().slice(0,2).join('/')})</p>
+                        </div>
+                        <div class="app-event-countdown">
+                            <span class="app-countdown-number">${diff === 0 ? 'Hôm nay' : diff + ' Ngày'}</span>
+                            <span class="app-countdown-text">${diff === 0 ? 'Tưởng nhớ' : 'sắp tới'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        document.getElementById('event-count').innerText = count;
+    })();
+</script>
+    
     <div style="max-width: 950px; margin: 0 auto; padding: 0 20px; line-height: 1.8;">
         
         <div style="background-color: #fffdf5; border: 2px solid var(--gold); padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
