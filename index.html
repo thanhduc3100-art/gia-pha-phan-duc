@@ -100,18 +100,152 @@
 
     
     <style>
-        .calendar-widget { background: #ffffff; ... }
-        /* ... (các mã CSS khác) ... */
-    </style>
+    .calendar-widget {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        max-width: 550px;
+        margin: 30px auto 50px auto; /* Tạo khoảng cách đẹp với 3 cột bên dưới */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+    }
 
-    <div class="calendar-widget">
-        </div>
+    .today-section {
+        background: linear-gradient(135deg, #fdfbf7 0%, #f4ede1 100%);
+        border: 1px solid #eaddc6;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    .today-section h3 { margin: 0; color: #8b0000; font-size: 1.1rem; }
+    .today-section p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
 
-    <script src="amlich.js"></script>
-    <script>
-        // ... (Mã xử lý ngày tháng) ...
-    </script>
-    </main> <footer style="...">...</footer>
+    .events-header { font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; }
+
+    .event-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        border: 1px solid #f0f0f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .event-color-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; }
+
+    .event-info-group { display: flex; align-items: center; gap: 12px; }
+
+    .event-icon-box {
+        width: 40px; height: 40px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+
+    .event-details h4 { margin: 0; color: #1a1a1a; font-size: 0.95rem; font-weight: 600; }
+    .event-details p { margin: 2px 0 0; color: #888; font-size: 0.8rem; }
+
+    .event-countdown { text-align: right; min-width: 80px; }
+    .countdown-number { font-size: 1rem; font-weight: bold; display: block; }
+    .countdown-text { font-size: 0.7rem; color: #999; text-transform: uppercase; }
+
+    /* Quy định màu sắc */
+    .color-urgent { background-color: #e53935; }
+    .color-normal { background-color: #d4af37; }
+    .color-far { background-color: #4caf50; }
+    
+    .bg-urgent { background-color: #ffebee; color: #e53935; }
+    .bg-normal { background-color: #fff8e1; color: #f57f17; }
+    .bg-far { background-color: #e8f5e9; color: #2e7d32; }
+</style>
+
+<div class="calendar-widget">
+    <div class="today-section">
+        <h3 id="display-lunar">Đang tính lịch...</h3>
+        <p id="display-solar"></p>
+    </div>
+
+    <div class="events-header">SỰ KIỆN SẮP TỚI</div>
+    <div id="countdown-list"></div>
+</div>
+
+<script src="amlich.js"></script>
+
+<script>
+    const lunarEvents = [
+        { name: "Giỗ Ông cao tổ Phan Đức Mưu", d: 2, m: 1, loc: "Huế", icon: "👴" },
+        { name: "Chạp hiệp kỵ Chi hai", d: 15, m: 4, loc: "Huế", icon: "🏮" },
+        { name: "Lễ Vu Lan", d: 15, m: 7, loc: "Huế", icon: "🌸" },
+        { name: "Kỵ bà Phan Thị Hảo & Thảo", d: 7, m: 12, loc: "Huế", icon: "🙏" },
+        { name: "Giỗ ông Phan Đức Thương", d: 16, m: 3, loc: "Đà Nẵng", icon: "🕯️" },
+        { name: "Tưởng niệm cháu Phú Quý", d: 8, m: 4, loc: "Đà Nẵng", icon: "👼" },
+        { name: "Tưởng niệm em Phan Đức Trí", d: 2, m: 5, loc: "Đà Nẵng", icon: "🎗️" },
+        { name: "Tưởng niệm em Phan Đức Hải", d: 8, m: 5, loc: "Đà Nẵng", icon: "🎗️" },
+        { name: "Hiệp kỵ Tiền nhân (Cố, Nội)", d: 5, m: 9, loc: "Đà Nẵng", icon: "🍂" },
+        { name: "Giỗ bà Trần Thị Dung", d: 8, m: 11, loc: "Đà Nẵng", icon: "🙏" }
+    ];
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const curY = today.getFullYear();
+    
+    document.getElementById('display-solar').innerText = `Dương lịch: ${today.getDate()}/${today.getMonth()+1}/${curY}`;
+    
+    try {
+        const ln = getLunarDate(today.getDate(), today.getMonth()+1, curY, 7);
+        document.getElementById('display-lunar').innerText = `Hôm nay: Mùng ${ln[0]} tháng ${ln[1]} Âm lịch`;
+    } catch(e) {
+        document.getElementById('display-lunar').innerText = "Đang tải dữ liệu...";
+    }
+
+    let results = [];
+    lunarEvents.forEach(ev => {
+        try {
+            let s = getSolarDate(ev.d, ev.m, curY, 0, 7);
+            let dEv = new Date(s[2], s[1]-1, s[0]);
+
+            if (dEv < today) {
+                s = getSolarDate(ev.d, ev.m, curY + 1, 0, 7);
+                dEv = new Date(s[2], s[1]-1, s[0]);
+            }
+
+            const diff = Math.ceil((dEv - today)/(1000*3600*24));
+            results.push({...ev, diff, sStr: `${s[0]}/${s[1]}`});
+        } catch(e){}
+    });
+
+    results.sort((a,b) => a.diff - b.diff);
+
+    const list = document.getElementById('countdown-list');
+    results.forEach(ev => {
+        let cls = "far", txt = `${ev.diff} Ngày`, textColor = "#2e7d32";
+        if (ev.diff === 0) { cls = "urgent"; txt = "HÔM NAY"; textColor = "#e53935"; }
+        else if (ev.diff <= 15) { cls = "urgent"; textColor = "#e53935"; }
+        else if (ev.diff <= 45) { cls = "normal"; textColor = "#f57f17"; }
+
+        list.innerHTML += `
+            <div class="event-card">
+                <div class="event-color-bar color-${cls}"></div>
+                <div class="event-info-group">
+                    <div class="event-icon-box bg-${cls}">${ev.icon}</div>
+                    <div class="event-details">
+                        <h4>${ev.name}</h4>
+                        <p>${ev.d}/${ev.m} Âm lịch (DL: ${ev.sStr}) • ${ev.loc}</p>
+                    </div>
+                </div>
+                <div class="event-countdown">
+                    <span class="countdown-number" style="color: ${textColor};">${txt}</span>
+                    <span class="countdown-text">${ev.diff === 0 ? 'Tưởng nhớ' : 'Sắp tới'}</span>
+                </div>
+            </div>
+        `;
+    });
+</script>
     
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
             
