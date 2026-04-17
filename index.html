@@ -184,19 +184,19 @@
     document.getElementById('display-solar').innerText = `Dương lịch: ${today.getDate()}/${today.getMonth()+1}/${curY}`;
     document.getElementById('display-lunar').innerText = `Đang tải Lịch Âm từ Server...`;
 
-// Gọi API từ lich247.com - Bản cập nhật bóc tách dữ liệu lớp thứ 2
+// Gọi API từ lich247.com - Bản cập nhật bóc tách lớp thứ 3 (Chuẩn 100% cho Thành)
 fetch('https://lich247.com/api.php?action=get_day')
     .then(response => response.json())
     .then(res => {
-        // Vì dữ liệu nằm trong res.data nên chúng ta phải bốc từ res.data ra
-        // res.data.ngayAm hoặc res.data.thangAm là tên chuẩn của API này
-        const ngayAm = res.data.ngayAm || res.data.ngay || "?";
-        const thangAm = res.data.thangAm || res.data.thang || "?";
+        // Dựa trên ảnh Console Thành gửi: Dữ liệu nằm ở res.data.lunar.day
+        // Chúng ta phải đi qua 3 lớp: res -> data -> lunar -> day/month
+        const ngayAm = res.data.lunar.day || "?";
+        const thangAm = res.data.lunar.month || "?";
         
         // Hiển thị lên màn hình
         document.getElementById('display-lunar').innerText = `Hôm nay: Mùng ${ngayAm} tháng ${thangAm} Âm lịch`;
         
-        console.log("Dữ liệu chi tiết bên trong:", res.data);
+        console.log("Đã bóc tách thành công:", ngayAm, thangAm);
     })
     .catch(error => {
         document.getElementById('display-lunar').innerText = "Hôm nay (Lỗi kết nối lịch âm)";
