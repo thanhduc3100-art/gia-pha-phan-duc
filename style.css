@@ -440,3 +440,70 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
 .genealogy-content li strong {
     color: #000; /* Hoặc để màu #8b0000 nếu muốn nổi bật kiểu truyền thống */
 }
+
+/* =========================================
+   GIAO DIỆN BẢNG LỊCH ÂM VÀ ĐẾM NGƯỢC 
+   ========================================= */
+.calendar-widget {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 550px;
+    margin: 30px auto 80px auto; /* Khoảng cách 80px giúp chân trang thoáng hơn */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.today-section {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f4ede1 100%);
+    border: 1px solid #eaddc6;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.today-section h3 { margin: 0; color: #8b0000; font-size: 1.1rem; font-weight: bold; }
+.today-section p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+
+.events-header { font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; }
+
+.event-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1px solid #f0f0f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.event-color-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; }
+
+.event-info-group { display: flex; align-items: center; gap: 12px; }
+
+.event-icon-box {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+
+.event-details h4 { margin: 0; color: #1a1a1a; font-size: 0.95rem; font-weight: 600; }
+.event-details p { margin: 2px 0 0; color: #888; font-size: 0.8rem; }
+
+.event-countdown { text-align: right; min-width: 80px; }
+.countdown-number { font-size: 1rem; font-weight: bold; display: block; }
+.countdown-text { font-size: 0.7rem; color: #999; text-transform: uppercase; }
+
+/* Các lớp màu sắc */
+.color-urgent { background-color: #e53935; } /* Đỏ */
+.color-normal { background-color: #d4af37; } /* Vàng */
+.color-far { background-color: #4caf50; }    /* Xanh */
+
+.bg-urgent { background-color: #ffebee; color: #e53935; }
+.bg-normal { background-color: #fff8e1; color: #f57f17; }
+.bg-far { background-color: #e8f5e9; color: #2e7d32; }
