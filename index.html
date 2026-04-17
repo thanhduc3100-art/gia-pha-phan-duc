@@ -184,22 +184,24 @@
     document.getElementById('display-solar').innerText = `Dương lịch: ${today.getDate()}/${today.getMonth()+1}/${curY}`;
     document.getElementById('display-lunar').innerText = `Đang tải Lịch Âm từ Server...`;
 
-  // Gọi API từ lich247.com - Bản cập nhật chuẩn cho gia phả
-    fetch('https://lich247.com/api.php?action=get_day')
-        .then(response => response.json())
-        .then(data => {
-            // Lấy đúng tên biến từ API lich247
-            const ngayAm = data.ngay || data.lunar_day || "?";
-            const thangAm = data.thang || data.lunar_month || "?";
-            
-            // Hiển thị lên màn hình
-            document.getElementById('display-lunar').innerText = `Hôm nay: Mùng ${ngayAm} tháng ${thangAm} Âm lịch`;
-        })
-        .catch(error => {
-            document.getElementById('display-lunar').innerText = "Hôm nay (Lỗi kết nối lịch âm)";
-            console.error("Lỗi API:", error);
-        });
-
+  // Gọi API từ lich247.com - Bản cập nhật chính xác cho Thành
+fetch('https://lich247.com/api.php?action=get_day')
+    .then(response => response.json())
+    .then(data => {
+        // API của lich247 dùng ngayAm và thangAm (chữ A viết hoa)
+        // JavaScript phân biệt chữ hoa chữ thường nên phải viết chuẩn 100%
+        const ngayAm = data.ngayAm || "?";
+        const thangAm = data.thangAm || "?";
+        
+        // Hiển thị lên màn hình
+        document.getElementById('display-lunar').innerText = `Hôm nay: Mùng ${ngayAm} tháng ${thangAm} Âm lịch`;
+        
+        console.log("Đã nhận dữ liệu chuẩn:", data);
+    })
+    .catch(error => {
+        document.getElementById('display-lunar').innerText = "Hôm nay (Lỗi kết nối lịch âm)";
+        console.error("Lỗi kết nối:", error);
+    });
     // 2. DANH SÁCH SỰ KIỆN ĐÃ QUY ĐỔI SANG DƯƠNG LỊCH (NĂM 2026)
     // Đảm bảo chính xác 100%, không dùng thuật toán dễ gây lỗi
     const lunarEvents2026 = [
