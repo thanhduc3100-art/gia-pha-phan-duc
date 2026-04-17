@@ -285,20 +285,25 @@
     // 1. HIỂN THỊ NGÀY DƯƠNG LỊCH MỚI
     document.getElementById('date-solar-app').innerText = formatWesternDate(today);
 
-    // 2. GỌI API ĐỂ LẤY NGÀY ÂM/NĂM CHÍNH XÁC (Sử dụng API Thành cung cấp)
+   // 2. GỌI API MỚI (apiamlich.thuc.me) - BẢN FIX LỖI UNDEFINED
+    const apiKey = "al_jj6v21v0sjqd81ewsp";
     fetch(`https://apiamlich.thuc.me/api/today?key=${apiKey}`)
         .then(response => response.json())
         .then(res => {
             if(res.success) {
                 const lunar = res.data.lunar;
-                // Định dạng ngày âm và Can Chi
+                const canChi = res.data.can_chi; // Lấy dữ liệu Can Chi riêng biệt
+
+                // Định dạng ngày âm
                 const prefix = lunar.day < 10 ? "Mùng " : "";
                 const isLeapText = lunar.isLeap ? " (Nhuận)" : "";
                 
                 document.getElementById('date-lunar-app').innerText = `${prefix}${lunar.day} tháng ${lunar.month}${isLeapText}`;
-                document.getElementById('year-can-chi').innerText = `Năm ${lunar.year_in_can_chi}`;
                 
-                console.log("Dữ liệu âm lịch chuẩn:", lunar);
+                // SỬA TẠI ĐÂY: Lấy canChi.year thay vì lunar.year_in_can_chi
+                document.getElementById('year-can-chi').innerText = `Năm ${canChi.year}`;
+                
+                console.log("Dữ liệu âm lịch chuẩn:", res.data);
             }
         })
         .catch(error => {
