@@ -175,104 +175,93 @@
 </div>
 
 <script>
-    // 1. DÙNG API ĐỂ LẤY LỊCH ÂM HÔM NAY
     const today = new Date();
     today.setHours(0,0,0,0);
-    const curY = today.getFullYear();
+    const d = today.getDate(), m = today.getMonth() + 1, y = today.getFullYear();
     
-    // In Dương Lịch trước
-    document.getElementById('display-solar').innerText = `Dương lịch: ${today.getDate()}/${today.getMonth()+1}/${curY}`;
-    document.getElementById('display-lunar').innerText = `Đang tải Lịch Âm từ Server...`;
+    // 1. HIỂN THỊ NGÀY DƯƠNG LỊCH
+    document.getElementById('display-solar').innerText = `Dương lịch: ${d}/${m}/${y}`;
+    document.getElementById('display-lunar').innerText = `Đang kết nối Server...`;
 
-// Gọi API từ lich247.com - Bản cập nhật bóc tách lớp thứ 3 (Chuẩn 100% cho Thành)
-fetch('https://lich247.com/api.php?action=get_day')
-    .then(response => response.json())
-    .then(res => {
-        // Dựa trên ảnh Console Thành gửi: Dữ liệu nằm ở res.data.lunar.day
-        // Chúng ta phải đi qua 3 lớp: res -> data -> lunar -> day/month
-        const ngayAm = res.data.lunar.day || "?";
-        const thangAm = res.data.lunar.month || "?";
-        
-        // Hiển thị lên màn hình
-        document.getElementById('display-lunar').innerText = `Hôm nay: Mùng ${ngayAm} tháng ${thangAm} Âm lịch`;
-        
-        console.log("Đã bóc tách thành công:", ngayAm, thangAm);
-    })
-    .catch(error => {
-        document.getElementById('display-lunar').innerText = "Hôm nay (Lỗi kết nối lịch âm)";
-        console.error("Lỗi kết nối:", error);
-    });
-    
-    // 2. DANH SÁCH SỰ KIỆN ĐÃ QUY ĐỔI SANG DƯƠNG LỊCH (NĂM 2026)
-    // Đảm bảo chính xác 100%, không dùng thuật toán dễ gây lỗi
+    // 2. GỌI API MỚI (apiamlich.thuc.me)
+    const apiKey = "al_jj6v21v0sjqd81ewsp";
+    fetch(`https://apiamlich.thuc.me/api/today?key=${apiKey}`)
+        .then(response => response.json())
+        .then(res => {
+            if(res.success) {
+                // Bóc tách dữ liệu từ cấu trúc: res -> data -> lunar -> day/month
+                const lunar = res.data.lunar;
+                const ngayAm = lunar.day;
+                const thangAm = lunar.month;
+                const isLeap = lunar.isLeap ? " (Nhuận)" : "";
+
+                // Định dạng hiển thị "Mùng" cho ngày nhỏ hơn 10 cho đẹp
+                const prefix = ngayAm < 10 ? "Mùng " : "";
+                
+                document.getElementById('display-lunar').innerText = `Hôm nay: ${prefix}${ngayAm} tháng ${thangAm}${isLeap} Âm lịch`;
+                console.log("Dữ liệu âm lịch chuẩn:", lunar);
+            }
+        })
+        .catch(error => {
+            document.getElementById('display-lunar').innerText = "Hôm nay (Lỗi tải lịch âm)";
+            console.error("Lỗi API:", error);
+        });
+
+    // 3. DANH SÁCH SỰ KIỆN CỐ ĐỊNH NĂM 2026
     const lunarEvents2026 = [
-        // NHÀ THỜ HUẾ
         { name: "Giỗ Ông cao tổ Phan Đức Mưu", sDate: "2026-02-18", lDate: "2/1", loc: "Huế", icon: "👴" },
-        { name: "Chạp hiệp kỵ Chi hai", sDate: "2026-05-31", lDate: "15/4", loc: "Huế", icon: "🏮" },
-        { name: "Lễ Vu Lan", sDate: "2026-08-27", lDate: "15/7", loc: "Huế", icon: "🌸" },
-        { name: "Kỵ bà Phan Thị Hảo & Thảo", sDate: "2027-01-14", lDate: "7/12", loc: "Huế", icon: "🙏" },
-        
-        // NHÀ THỜ ĐÀ NẴNG
         { name: "Giỗ ông Phan Đức Thương", sDate: "2026-05-02", lDate: "16/3", loc: "Đà Nẵng", icon: "🕯️" },
         { name: "Tưởng niệm cháu Phú Quý", sDate: "2026-05-24", lDate: "8/4", loc: "Đà Nẵng", icon: "👼" },
+        { name: "Chạp hiệp kỵ Chi hai", sDate: "2026-05-31", lDate: "15/4", loc: "Huế", icon: "🏮" },
         { name: "Tưởng niệm em Phan Đức Trí", sDate: "2026-06-16", lDate: "2/5", loc: "Đà Nẵng", icon: "🎗️" },
         { name: "Tưởng niệm em Phan Đức Hải", sDate: "2026-06-22", lDate: "8/5", loc: "Đà Nẵng", icon: "🎗️" },
+        { name: "Lễ Vu Lan", sDate: "2026-08-27", lDate: "15/7", loc: "Huế", icon: "🌸" },
         { name: "Hiệp kỵ Tiền nhân (Cố, Nội)", sDate: "2026-10-14", lDate: "5/9", loc: "Đà Nẵng", icon: "🍂" },
-        { name: "Giỗ bà Trần Thị Dung", sDate: "2026-12-16", lDate: "8/11", loc: "Đà Nẵng", icon: "🙏" }
+        { name: "Giỗ bà Trần Thị Dung", sDate: "2026-12-16", lDate: "8/11", loc: "Đà Nẵng", icon: "🙏" },
+        { name: "Kỵ bà Phan Thị Hảo & Thảo", sDate: "2027-01-14", lDate: "7/12", loc: "Huế", icon: "🙏" }
     ];
 
-    // 3. TÍNH TOÁN ĐẾM NGƯỢC
+    // 4. HIỂN THỊ DANH SÁCH ĐẾM NGƯỢC
+    const list = document.getElementById('countdown-list');
     let results = [];
+
     lunarEvents2026.forEach(ev => {
         let dEv = new Date(ev.sDate);
         dEv.setHours(0,0,0,0);
-
-        // Tính khoảng cách ngày
         const diff = Math.ceil((dEv.getTime() - today.getTime()) / (1000*3600*24));
-        
-        // Cắt lấy ngày/tháng Dương lịch để hiển thị (ví dụ từ 2026-05-02 thành 02/05)
         const sArr = ev.sDate.split("-");
         const sStr = `${sArr[2]}/${sArr[1]}`;
 
-        // Chỉ đưa vào danh sách những sự kiện chưa qua (diff >= 0)
         if (diff >= 0) {
             results.push({...ev, diff, sStr});
         }
     });
 
-    // Sắp xếp sự kiện gần nhất lên trên
     results.sort((a,b) => a.diff - b.diff);
 
-    // 4. IN RA GIAO DIỆN
-    const list = document.getElementById('countdown-list');
-    
-    if (results.length === 0) {
-        list.innerHTML = `<p style="text-align:center; color:#888;">Đã qua hết các ngày giỗ trong năm nay.</p>`;
-    } else {
-        results.forEach(ev => {
-            let cls = "far", txt = `${ev.diff} Ngày`, textColor = "#2e7d32";
-            if (ev.diff === 0) { cls = "urgent"; txt = "HÔM NAY"; textColor = "#e53935"; }
-            else if (ev.diff <= 15) { cls = "urgent"; textColor = "#e53935"; }
-            else if (ev.diff <= 45) { cls = "normal"; textColor = "#f57f17"; }
+    results.forEach(ev => {
+        let cls = "far", txt = `${ev.diff} Ngày`, textColor = "#2e7d32";
+        if (ev.diff === 0) { cls = "urgent"; txt = "HÔM NAY"; textColor = "#e53935"; }
+        else if (ev.diff <= 15) { cls = "urgent"; textColor = "#e53935"; }
+        else if (ev.diff <= 45) { cls = "normal"; textColor = "#f57f17"; }
 
-            list.innerHTML += `
-                <div class="event-card">
-                    <div class="event-color-bar color-${cls}"></div>
-                    <div class="event-info-group">
-                        <div class="event-icon-box bg-${cls}">${ev.icon}</div>
-                        <div class="event-details">
-                            <h4>${ev.name}</h4>
-                            <p>${ev.lDate} Âm lịch (DL: ${ev.sStr}) • ${ev.loc}</p>
-                        </div>
-                    </div>
-                    <div class="event-countdown">
-                        <span class="countdown-number style-text-${cls}" style="color:${textColor}">${txt}</span>
-                        <span class="countdown-text">${ev.diff === 0 ? 'Tưởng nhớ' : 'Sắp tới'}</span>
+        list.innerHTML += `
+            <div class="event-card">
+                <div class="event-color-bar color-${cls}"></div>
+                <div class="event-info-group">
+                    <div class="event-icon-box bg-${cls}">${ev.icon}</div>
+                    <div class="event-details">
+                        <h4>${ev.name}</h4>
+                        <p>${ev.lDate} Âm lịch (DL: ${ev.sStr}) • ${ev.loc}</p>
                     </div>
                 </div>
-            `;
-        });
-    }
+                <div class="event-countdown">
+                    <span class="countdown-number" style="color:${textColor}">${txt}</span>
+                    <span class="countdown-text">${ev.diff === 0 ? 'Tưởng nhớ' : 'Sắp tới'}</span>
+                </div>
+            </div>
+        `;
+    });
 </script>
     
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
