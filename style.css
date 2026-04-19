@@ -507,3 +507,17 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
 .bg-urgent { background-color: #ffebee; color: #e53935; }
 .bg-normal { background-color: #fff8e1; color: #f57f17; }
 .bg-far { background-color: #e8f5e9; color: #2e7d32; }
+
+/* SỬA LỖI ẢNH KHÔNG DÀI BẰNG CHỮ */
+.img-zoom-container, .img-container {
+    display: block !important;    /* Ép khung phải chiếm hết chiều ngang */
+    width: 100% !important;      /* Giãn ra 100% */
+    max-width: none !important;  /* Bỏ giới hạn 800px cũ */
+    margin: 20px 0;
+}
+
+.img-zoom-container img, .img-container img {
+    width: 100% !important;      /* Ép tấm ảnh bên trong phải rộng bằng khung */
+    height: auto !important;
+    display: block;
+}
