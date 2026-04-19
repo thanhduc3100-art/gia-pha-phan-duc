@@ -521,3 +521,54 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     height: auto !important;
     display: block;
 }
+/* --- ĐỊNH DẠNG TỪNG THẺ ẢNH CÓ CHÚ THÍCH --- */
+.grid-item {
+    width: 100%;
+    background-color: #ffffff; /* Nền trắng cho phần chữ */
+    border-radius: 8px;
+    border: 2px solid #eee;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Khung bọc ảnh để giữ tỷ lệ và cắt viền khi zoom */
+.grid-img-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3; /* Cố định ảnh vuông vức tỷ lệ 4:3 */
+    overflow: hidden;
+    border-bottom: 1px solid #f0f0f0; /* Đường kẻ mờ ngăn cách ảnh và chữ */
+}
+
+.grid-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease; /* Thời gian zoom ảnh */
+}
+
+/* Phần chữ chú thích dưới ảnh */
+.photo-caption {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #444;
+    font-style: italic; /* Chữ in nghiêng nhìn giống ghi chú album */
+    background-color: #ffffff;
+    flex-grow: 1; /* Đảm bảo các khung chữ cao bằng nhau */
+}
+
+/* --- HIỆU ỨNG DI CHUỘT (HOVER) --- */
+.grid-item:hover {
+    border-color: var(--gold); /* Viền sáng lên màu vàng */
+    transform: translateY(-5px); /* Cả thẻ ảnh nổi bồng lên một chút */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.grid-item:hover .grid-img-wrap img {
+    transform: scale(1.08); /* Ảnh bên trong từ từ phóng to */
+    cursor: pointer;
+}
