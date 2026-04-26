@@ -108,23 +108,31 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI --- */
+/* --- TỐI ƯU GIAO DIỆN CHO ĐIỆN THOẠI (Gộp & Sửa lỗi rớt dòng) --- */
 @media screen and (max-width: 768px) {
     /* 1. Sửa lỗi bóp chữ: Mở rộng nội dung ra sát biên */
     .content-section {
-        margin: 10px auto !important; /* Giảm lề trên dưới */
-        padding: 15px !important;    /* Giảm lề trong từ 30px xuống 15px */
-        width: 95% !important;       /* Tận dụng 95% chiều rộng màn hình */
+        margin: 10px auto !important;
+        padding: 15px !important;
+        width: 95% !important;
+    }
+
+    /* Thu nhỏ tiêu đề để tránh rớt dòng không đẹp */
+    h1 {
+        font-size: 1.4rem !important; /* Chữ nhỏ lại để vừa một hàng */
+        white-space: normal; /* Cho phép ngắt dòng nếu quá dài nhưng font đã nhỏ hơn */
+        line-height: 1.3;
     }
 
     /* 2. Ép các khung Lời Ngỏ, Đóng Góp rộng ra 100% trên mobile */
-    .content-section div[style*="max-width"] {
+    .content-section div[style*="max-width"], 
+    main div[style*="max-width"] {
         max-width: 100% !important;
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
 
-    /* 3. Chỉnh sửa Navbar vuốt ngang (Giữ nguyên logic của bạn) */
+    /* 3. Chỉnh sửa Navbar vuốt ngang */
     .navbar {
         display: flex !important;
         overflow-x: auto !important;
@@ -149,16 +157,17 @@ body {
     .navbar a, .dropdown-content a {
         border-bottom: none !important;
         padding: 10px 12px !important;
-        font-size: 12px !important;
+        font-size: 11px !important; /* Thu nhỏ chữ menu một chút */
         display: inline-block !important;
         color: white !important;
+        white-space: nowrap !important; /* Ép chữ menu nằm trên 1 hàng */
     }
 
-    /* Đảm bảo chữ trong các trang con không bị canh đều (tránh lỗi giãn chữ quá xa trên mobile) */
+    /* Đảm bảo chữ trong các trang con không bị canh đều quá xa */
     p {
         text-align: left !important;
-        text-indent: 0 !important; /* Bỏ thụt đầu dòng để tiết kiệm diện tích trên màn hình hẹp */
-        font-size: 1rem !important;
+        text-indent: 0 !important;
+        font-size: 0.95rem !important; /* Giảm nhẹ cỡ chữ văn bản */
     }
 }
 
