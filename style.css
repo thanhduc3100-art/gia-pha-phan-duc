@@ -581,3 +581,91 @@ footer { text-align: center; padding: 30px; color: #888; background: #eee; margi
     transform: scale(1.08); /* Ảnh bên trong từ từ phóng to */
     cursor: pointer;
 }
+
+/* --- PHẦN ĐĂNG KÝ EMAIL --- */
+.subscribe-section {
+    max-width: 800px;
+    margin: 50px auto 80px auto;
+    padding: 0 20px;
+}
+
+.subscribe-content {
+    background-color: #fffdf5; /* Nền vàng kem */
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.subscribe-title {
+    color: var(--red-dark);
+    font-size: 1.6rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.subscribe-desc {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.subscribe-form {
+    display: flex;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 10px;
+}
+
+.subscribe-input {
+    flex: 1;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.subscribe-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+.subscribe-btn {
+    background-color: var(--red-dark);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+
+.subscribe-btn:hover {
+    background-color: #a00000; /* Đỏ sáng hơn một chút khi di chuột */
+}
+
+.subscribe-note {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 15px;
+    font-style: italic;
+}
+
+/* Tối ưu cho điện thoại */
+@media screen and (max-width: 600px) {
+    .subscribe-form {
+        flex-direction: column; /* Đẩy nút đăng ký xuống dưới ô nhập trên điện thoại */
+    }
+    .subscribe-btn {
+        width: 100%;
+    }
+}
