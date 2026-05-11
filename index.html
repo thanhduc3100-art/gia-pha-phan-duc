@@ -288,19 +288,31 @@
 <form 
     action="https://docs.google.com/forms/d/e/1FAIpQLSe055vSy6-W_QR2epPJSvo6WImcL4SvLANRxAkBeKtTtOnw_Q/formResponse" 
     method="POST" 
+    target="hidden_iframe" 
+    id="sub-form" 
     class="subscribe-form">
     
     <input type="email" name="entry.1045781291" class="subscribe-input" placeholder="Nhập địa chỉ email của bạn..." required>
     <button type="submit" class="subscribe-btn">Đăng ký ngay</button>
 </form>
 
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {alert('Cảm ơn! Gia đình đã nhận được email đăng ký của bạn.');}"></iframe>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { showSuccessMessage(); }"></iframe>
 
 <script>
     var submitted = false;
+    
+    // Khi người dùng bấm nút gửi, đánh dấu là đã gửi
     document.getElementById('sub-form').onsubmit = function() {
         submitted = true;
     };
+
+    // Hàm hiển thị thông báo thành công
+    function showSuccessMessage() {
+        alert('Cảm ơn thành viên! Thông tin của bạn đã được ghi lại thành công.');
+        // Sau khi hiện thông báo, reset lại form và trạng thái
+        document.getElementById('sub-form').reset();
+        submitted = false;
+    }
 </script>
 <footer style="text-align: center; margin-top: 100px; padding: 20px; color: #888; border-top: 1px solid #eee;">
     <p>© 2026 Gia đình Phan Đức - Giữ gìn nguồn cội, kết nối tương lai</p>
