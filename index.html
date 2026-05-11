@@ -285,33 +285,34 @@
       
     </div>
 </main>
-<form 
-    action="https://docs.google.com/forms/d/e/1FAIpQLSe055vSy6-W_QR2epPJSvo6WImcL4SvLANRxAkBeKtTtOnw_Q/formResponse" 
-    method="POST" 
-    target="hidden_iframe" 
-    id="sub-form" 
-    class="subscribe-form">
-    
-    <input type="email" name="entry.1045781291" class="subscribe-input" placeholder="Nhập địa chỉ email của bạn..." required>
-    <button type="submit" class="subscribe-btn">Đăng ký ngay</button>
-</form>
 
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { showSuccessMessage(); }"></iframe>
+<div class="subscribe-section">
+    <div class="subscribe-content">
+        <h3 class="subscribe-title">🔔 Nhận Thông Báo Sự Kiện</h3>
+        <p class="subscribe-desc">Vui lòng để lại email để nhận thông báo về các ngày giỗ, kỵ của gia đình.</p>
+
+        <form 
+            action="https://docs.google.com/forms/d/e/1FAIpQLSe055vSy6-W_QR2epPJSvo6WImcL4SvLANRxAkBeKtTtOnw_Q/formResponse" 
+            method="POST" 
+            target="hidden_iframe" 
+            id="sub-form" 
+            class="subscribe-form">
+            
+            <input type="email" name="entry.1045781291" class="subscribe-input" placeholder="Nhập địa chỉ email của bạn..." required>
+            <button type="submit" class="subscribe-btn">Đăng ký ngay</button>
+        </form>
+
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(typeof submitted !== 'undefined' && submitted) { alert('Cảm ơn thành viên! Thông tin đã được ghi lại.'); location.reload(); }"></iframe>
+    </div>
+</div>
 
 <script>
     var submitted = false;
-    
-    // Khi người dùng bấm nút gửi, đánh dấu là đã gửi
-    document.getElementById('sub-form').onsubmit = function() {
-        submitted = true;
-    };
-
-    // Hàm hiển thị thông báo thành công
-    function showSuccessMessage() {
-        alert('Cảm ơn thành viên! Thông tin của bạn đã được ghi lại thành công.');
-        // Sau khi hiện thông báo, reset lại form và trạng thái
-        document.getElementById('sub-form').reset();
-        submitted = false;
+    var formElement = document.getElementById('sub-form');
+    if (formElement) {
+        formElement.onsubmit = function() {
+            submitted = true;
+        };
     }
 </script>
 <footer style="text-align: center; margin-top: 100px; padding: 20px; color: #888; border-top: 1px solid #eee;">
