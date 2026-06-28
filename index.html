@@ -217,7 +217,7 @@
         const weekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
         document.getElementById('date-solar-app').innerText = `${weekdays[today.getDay()]}, ${today.getDate()} tháng ${today.getMonth() + 1}, ${today.getFullYear()}`;
 
-        // 1. GỌI API
+        // 1. GỌI API (Đã thêm chốt an toàn chống lỗi)
         fetch(`https://apiamlich.thuc.me/api/today?key=${apiKey}`)
             .then(res => res.json())
             .then(res => {
@@ -227,11 +227,17 @@
                     
                     const prefix = lunar.day < 10 ? "Mùng " : "";
                     document.getElementById('date-lunar-app').innerText = `${prefix}${lunar.day} tháng ${lunar.month}`;
-                    // FIX LỖI UNDEFINED TẠI ĐÂY:
-                    document.getElementById('year-can-chi').innerText = `Năm ${canChi.year}`;
+                    
+                    // Chốt an toàn: Kiểm tra xem API có trả về năm Can Chi không
+                    if (canChi && canChi.year) {
+                        document.getElementById('year-can-chi').innerText = `Năm ${canChi.year}`;
+                    }
                 }
             })
-            .catch(err => console.error("Lỗi API:", err));
+            .catch(err => {
+                console.error("Lỗi kết nối API Âm lịch:", err);
+                document.getElementById('date-lunar-app').innerText = "Tạm thời không tải được từ máy chủ";
+            });
 
         // 2. DANH SÁCH SỰ KIỆN
         const lunarEvents = [
@@ -259,7 +265,6 @@
             // CHỈ LẤY TRONG VÒNG 30 NGÀY
             if (diff >= 0 && diff <= 30) {
                 count++;
-                container.classList.remove('hidden');
                 listEl.innerHTML += `
                     <div class="app-event-card">
                         <div class="app-event-icon-box">${ev.icon}</div>
@@ -275,15 +280,16 @@
                 `;
             }
         });
+
         document.getElementById('event-count').innerText = count;
+        
+        // LUÔN HIỆN KHUNG SỰ KIỆN - Nếu count = 0 thì báo không có sự kiện
+        container.classList.remove('hidden');
+        if (count === 0) {
+            listEl.innerHTML = `<p style="text-align: center; color: #888; font-style: italic; padding: 15px 0;">Không có sự kiện, lễ kỵ nào trong 30 ngày tới.</p>`;
+        }
     })();
 </script>
-   
-
-  
-    
-      
-    </div>
 </main>
 
 <div class="subscribe-section" style="display: none;">
@@ -318,23 +324,7 @@
 <footer style="text-align: center; margin-top: 100px; padding: 20px; color: #888; border-top: 1px solid #eee;">
     <p>© 2026 Gia đình Phan Đức - Giữ gìn nguồn cội, kết nối tương lai</p>
 </footer>
-<script>
-    let currentSlide = 0;
-    const slides = document.querySelectorAll(".slide");
-    const totalSlides = slides.length;
 
-    function nextSlide() {
-        // Kiểm tra nếu có slide thì mới chạy (tránh lỗi)
-        if (slides.length === 0) return;
-        
-        slides[currentSlide].classList.remove("active");
-        currentSlide = (currentSlide + 1) % totalSlides;
-        slides[currentSlide].classList.add("active");
-    }
-
-    // Tự động chuyển sau mỗi 4 giây
-    setInterval(nextSlide, 4000);
-</script>
 </body>
 </html>
 
