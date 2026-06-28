@@ -218,7 +218,10 @@
         document.getElementById('date-solar-app').innerText = `${weekdays[today.getDay()]}, ${today.getDate()} tháng ${today.getMonth() + 1}, ${today.getFullYear()}`;
 
         // 1. GỌI API (Đã thêm chốt an toàn chống lỗi)
-        fetch(`https://apiamlich.thuc.me/api/today?key=${apiKey}`)
+        const targetUrl = `https://apiamlich.thuc.me/api/today?key=${apiKey}`;
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+
+        fetch(proxyUrl)
             .then(res => res.json())
             .then(res => {
                 if(res.success && res.data) {
